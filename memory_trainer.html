@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Memory Training Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#0f1420; --panel:#171e2e; --panel2:#1e2738; --border:#2a3446;
+    --text:#e8ecf4; --muted:#8b96ab; --accent:#5b8cff; --accent2:#37c9a1;
+    --bad:#e5626b; --good:#37c9a1; --warn:#f0b45a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); min-height:100vh;
+  }
+  header{
+    padding:20px 24px 0; text-align:center;
+  }
+  header h1{ margin:0 0 4px; font-size:22px; font-weight:700; }
+  header p{ margin:0; color:var(--muted); font-size:13px; }
+  nav{
+    display:flex; gap:6px; justify-content:center; flex-wrap:wrap;
+    padding:16px 12px; max-width:900px; margin:0 auto;
+  }
+  nav button{
+    background:var(--panel); color:var(--muted); border:1px solid var(--border);
+    padding:10px 16px; border-radius:10px; cursor:pointer; font-size:14px; font-weight:600;
+    transition:all .15s;
+  }
+  nav button:hover{ color:var(--text); }
+  nav button.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  main{ max-width:900px; margin:0 auto; padding:0 16px 60px; }
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:22px; margin-bottom:16px;
+  }
+  .panel h2{ margin:0 0 4px; font-size:18px; }
+  .panel .sub{ color:var(--muted); font-size:13px; margin-bottom:16px; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .btn{
+    background:var(--accent); color:#fff; border:none; padding:10px 18px;
+    border-radius:9px; font-weight:600; cursor:pointer; font-size:14px;
+  }
+  .btn.secondary{ background:var(--panel2); color:var(--text); border:1px solid var(--border); }
+  .btn.good{ background:var(--good); }
+  .btn.bad{ background:var(--bad); }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; }
+  select, input[type=number]{
+    background:var(--panel2); color:var(--text); border:1px solid var(--border);
+    border-radius:8px; padding:8px 10px; font-size:14px;
+  }
+  label.field{ display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); }
+  .stat{
+    background:var(--panel2); border:1px solid var(--border); border-radius:10px;
+    padding:10px 14px; text-align:center; min-width:90px;
+  }
+  .stat .n{ font-size:20px; font-weight:700; }
+  .stat .l{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  .digit-grid{ font-family:"SF Mono",Consolas,monospace; line-height:1.9; font-size:20px; letter-spacing:2px; }
+  .digit-row{ display:flex; gap:16px; margin-bottom:8px; flex-wrap:wrap; }
+  .digit-box{
+    width:30px; height:38px; text-align:center; border:1px solid var(--border);
+    border-radius:6px; background:var(--panel2); color:var(--text); font-size:18px;
+    font-family:"SF Mono",Consolas,monospace;
+  }
+  .digit-box.correct{ border-color:var(--good); background:rgba(55,201,161,.15); }
+  .digit-box.wrong{ border-color:var(--bad); background:rgba(229,98,107,.15); }
+  .digit-static{
+    display:inline-block; width:22px; text-align:center;
+  }
+  .card-chip{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:52px; height:64px; border-radius:8px; border:1px solid var(--border);
+    background:var(--panel2); font-weight:700; font-size:15px; cursor:pointer;
+    user-select:none; transition:transform .1s;
+  }
+  .card-chip.red{ color:#e5626b; }
+  .card-chip.black{ color:#e8ecf4; }
+  .card-chip.used{ opacity:.2; pointer-events:none; }
+  .card-chip:hover{ transform:translateY(-2px); border-color:var(--accent); }
+  .card-wrap{ display:flex; gap:8px; flex-wrap:wrap; }
+  .recalled-list{ display:flex; gap:6px; flex-wrap:wrap; min-height:70px; padding:10px; background:var(--panel2); border-radius:10px; border:1px dashed var(--border); }
+  .flash{
+    background:var(--panel2); border:1px solid var(--border); border-radius:14px;
+    padding:36px 24px; text-align:center; min-height:130px; display:flex; align-items:center; justify-content:center;
+    font-size:19px; line-height:1.5; margin-bottom:16px;
+  }
+  .flash .tag{ display:block; font-size:12px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.05em; }
+  .timer{ font-family:"SF Mono",Consolas,monospace; font-size:26px; font-weight:700; color:var(--accent2); }
+  .hidden{ display:none !important; }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip-toggle{
+    background:var(--panel2); border:1px solid var(--border); color:var(--muted);
+    padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer;
+  }
+  .chip-toggle.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .footer-note{ text-align:center; color:var(--muted); font-size:12px; margin-top:8px; }
+  .score-summary{ font-size:14px; color:var(--muted); margin-top:10px; }
+  .score-summary b{ color:var(--text); }
+  .best{ color:var(--warn); font-weight:600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Memory Training Hub</h1>
+  <p>Random Numbers &middot; Speed Cards &middot; Historical Dates &middot; Nature Facts &middot; TKD Theory</p>
+</header>
+
+<nav id="tabs">
+  <button data-tab="numbers" class="active">Numbers</button>
+  <button data-tab="cards">Cards</button>
+  <button data-tab="dates">Dates</button>
+  <button data-tab="nature">Nature</button>
+  <button data-tab="tkd">TKD Theory</button>
+  <button data-tab="systems">My Systems</button>
+  <button data-tab="oscars">Oscars &amp; Mercury</button>
+  <button data-tab="plan">Plan</button>
+</nav>
+
+<main>
+
+<!-- ================= NUMBERS ================= -->
+<section id="tab-numbers" class="tabpanel">
+  <div class="panel">
+    <h2>Random Numbers</h2>
+    <div class="sub">WMC discipline: memorise rows of 40 random digits and recall them in order (untimed event). Choose your own row count to practise.</div>
+    <div class="row" style="margin-bottom:14px;">
+      <label class="field">Rows
+        <select id="num-rows">
+          <option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option>
+        </select>
+      </label>
+      <label class="field">Digits per row
+        <select id="num-cols">
+          <option>20</option><option selected>40</option><option>50</option>
+        </select>
+      </label>
+      <button class="btn" id="num-generate">Generate new set</button>
+      <div class="stat"><div class="n" id="num-timer">00:00</div><div class="l">Study time</div></div>
+    </div>
+    <div id="num-study-area"></div>
+    <div class="row" style="margin-top:10px;">
+      <button class="btn secondary" id="num-start">Start studying</button>
+      <button class="btn" id="num-recall" disabled>Hide &amp; recall</button>
+      <button class="btn good" id="num-check" class="hidden">Check answers</button>
+    </div>
+    <div id="num-recall-area" style="margin-top:16px;"></div>
+    <div class="score-summary" id="num-score"></div>
+  </div>
+</section>
+
+<!-- ================= CARDS ================= -->
+<section id="tab-cards" class="tabpanel hidden">
+  <div class="panel">
+    <h2>Speed Cards</h2>
+    <div class="sub">WMC discipline: memorise the order of one shuffled 52-card deck as fast as possible. Click cards in the order you remember them to recall.</div>
+    <div class="row" style="margin-bottom:14px;">
+      <button class="btn" id="cards-shuffle">Shuffle new deck</button>
+      <button class="btn secondary" id="cards-start" disabled>Start memorizing</button>
+      <button class="btn" id="cards-stop" disabled>Stop &amp; recall</button>
+      <div class="stat"><div class="n timer" id="cards-timer">00.0s</div><div class="l">Memorize time</div></div>
+      <div class="stat"><div class="n" id="cards-best">&ndash;</div><div class="l">Personal best</div></div>
+    </div>
+    <div id="cards-study-area" class="card-wrap"></div>
+    <div id="cards-recall-area" class="hidden">
+      <p class="sub">Click the cards below in the order you recall them:</p>
+      <div class="recalled-list" id="cards-recalled"></div>
+      <div class="card-wrap" id="cards-palette" style="margin-top:12px;"></div>
+      <div class="row" style="margin-top:12px;">
+        <button class="btn good" id="cards-check">Check recall</button>
+        <button class="btn secondary" id="cards-undo">Undo last</button>
+      </div>
+    </div>
+    <div class="score-summary" id="cards-score"></div>
+  </div>
+</section>
+
+<!-- ================= DATES ================= -->
+<section id="tab-dates" class="tabpanel hidden">
+  <div class="panel">
+    <h2>Historical Dates</h2>
+    <div class="sub">Real world-history events. Flip the card, then mark yourself honestly &mdash; that's how the score stays useful.</div>
+    <div class="row" style="margin-bottom:14px;">
+      <label class="field">Direction
+        <select id="dates-dir">
+          <option value="both" selected>Mixed</option>
+          <option value="event">Event &rarr; Year</option>
+          <option value="year">Year &rarr; Event</option>
+        </select>
+      </label>
+      <button class="btn secondary" id="dates-shuffle">Shuffle deck</button>
+      <div class="stat"><div class="n" id="dates-score-n">0/0</div><div class="l">This session</div></div>
+      <div class="stat"><div class="n best" id="dates-best">&ndash;</div><div class="l">Best streak</div></div>
+    </div>
+    <div class="flash" id="dates-flash"><span></span></div>
+    <div class="row" style="justify-content:center;">
+      <button class="btn secondary" id="dates-reveal">Reveal</button>
+      <button class="btn good hidden" id="dates-got">Got it</button>
+      <button class="btn bad hidden" id="dates-missed">Missed it</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NATURE ================= -->
+<section id="tab-nature" class="tabpanel hidden">
+  <div class="panel">
+    <h2>Nature Facts</h2>
+    <div class="sub">General biology &amp; ecology trivia, flashcard style.</div>
+    <div class="row" style="margin-bottom:14px;">
+      <button class="btn secondary" id="nature-shuffle">Shuffle deck</button>
+      <div class="stat"><div class="n" id="nature-score-n">0/0</div><div class="l">This session</div></div>
+      <div class="stat"><div class="n best" id="nature-best">&ndash;</div><div class="l">Best streak</div></div>
+    </div>
+    <div class="flash" id="nature-flash"><span></span></div>
+    <div class="row" style="justify-content:center;">
+      <button class="btn secondary" id="nature-reveal">Reveal</button>
+      <button class="btn good hidden" id="nature-got">Got it</button>
+      <button class="btn bad hidden" id="nature-missed">Missed it</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TKD ================= -->
+<section id="tab-tkd" class="tabpanel hidden">
+  <div class="panel">
+    <h2>TKD Theory (ITF)</h2>
+    <div class="sub">Chang-Hon patterns and Korean terminology.</div>
+    <div class="row" style="margin-bottom:14px;">
+      <label class="field">Deck
+        <select id="tkd-deck">
+          <option value="patterns">Patterns (names, moves, meaning)</option>
+          <option value="terms">Terminology (Korean &harr; English)</option>
+        </select>
+      </label>
+      <div id="tkd-cat-wrap" class="chips hidden"></div>
+      <button class="btn secondary" id="tkd-shuffle">Shuffle deck</button>
+      <div class="stat"><div class="n" id="tkd-score-n">0/0</div><div class="l">This session</div></div>
+      <div class="stat"><div class="n best" id="tkd-best">&ndash;</div><div class="l">Best streak</div></div>
+    </div>
+    <div class="flash" id="tkd-flash"><span></span></div>
+    <div class="row" style="justify-content:center;">
+      <button class="btn secondary" id="tkd-reveal">Reveal</button>
+      <button class="btn good hidden" id="tkd-got">Got it</button>
+      <button class="btn bad hidden" id="tkd-missed">Missed it</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MY SYSTEMS ================= -->
+<section id="tab-systems" class="tabpanel hidden">
+  <div class="panel">
+    <h2>My Systems</h2>
+    <div class="sub">Your own encoding systems, pulled in from your revision materials &mdash; look them up, or drill yourself on them.</div>
+    <div class="row" style="margin-bottom:14px;">
+      <label class="field">System
+        <select id="sys-which">
+          <option value="major">Major System (numbers)</option>
+          <option value="pao">PAO Card System</option>
+          <option value="palace">Memory Palace (loci)</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Major system controls -->
+    <div id="sys-major-controls" class="row" style="margin-bottom:14px;">
+      <label class="field">Digits
+        <select id="sys-major-len">
+          <option value="single">Single (0-9)</option>
+          <option value="double" selected>Double (00-99)</option>
+          <option value="triple">Triple (000-999)</option>
+        </select>
+      </label>
+      <label class="field">Look up a number
+        <input type="text" id="sys-major-lookup" placeholder="e.g. 42" style="width:110px;">
+      </label>
+      <div class="stat" id="sys-major-lookup-result" style="min-width:220px;">&nbsp;</div>
+    </div>
+
+    <!-- PAO controls -->
+    <div id="sys-pao-controls" class="row hidden" style="margin-bottom:14px;">
+      <label class="field">Look up a card
+        <input type="text" id="sys-pao-lookup" placeholder="e.g. QH" style="width:110px;">
+      </label>
+      <div class="stat" id="sys-pao-lookup-result" style="min-width:260px;">&nbsp;</div>
+    </div>
+
+    <!-- Palace controls -->
+    <div id="sys-palace-controls" class="row hidden" style="margin-bottom:14px;">
+      <label class="field">Quiz direction
+        <select id="sys-palace-dir">
+          <option value="both" selected>Mixed</option>
+          <option value="loc">Position &rarr; Location</option>
+          <option value="num">Location &rarr; Position</option>
+        </select>
+      </label>
+      <button class="btn secondary" id="sys-palace-showall">Show full route</button>
+    </div>
+
+    <div class="row" style="margin-bottom:14px;">
+      <button class="btn secondary" id="sys-shuffle">Shuffle deck</button>
+      <div class="stat"><div class="n" id="sys-score-n">0/0</div><div class="l">This session</div></div>
+      <div class="stat"><div class="n best" id="sys-best">&ndash;</div><div class="l">Best streak</div></div>
+    </div>
+
+    <div id="sys-full-list" class="hidden" style="max-height:240px; overflow-y:auto; background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:14px; line-height:1.7;"></div>
+
+    <div class="flash" id="sys-flash"><span></span></div>
+    <div class="row" style="justify-content:center;">
+      <button class="btn secondary" id="sys-reveal">Reveal</button>
+      <button class="btn good hidden" id="sys-got">Got it</button>
+      <button class="btn bad hidden" id="sys-missed">Missed it</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OSCARS & MERCURY ================= -->
+<section id="tab-oscars" class="tabpanel hidden">
+  <div class="panel">
+    <h2>Oscars &amp; Mercury Prize</h2>
+    <div class="sub">Best Picture, Best Actor, Best Actress, Best Original Song, Best Animated Feature, and the UK Mercury Prize.</div>
+    <div class="row" style="margin-bottom:14px;">
+      <label class="field">Deck
+        <select id="osc-deck">
+          <option value="picture">Best Picture</option>
+          <option value="actor">Best Actor</option>
+          <option value="actress">Best Actress</option>
+          <option value="song">Best Original Song</option>
+          <option value="animated">Best Animated Feature</option>
+          <option value="mercury">Mercury Prize</option>
+        </select>
+      </label>
+      <button class="btn secondary" id="osc-shuffle">Shuffle deck</button>
+      <div class="stat"><div class="n" id="osc-score-n">0/0</div><div class="l">This session</div></div>
+      <div class="stat"><div class="n best" id="osc-best">&ndash;</div><div class="l">Best streak</div></div>
+    </div>
+    <div class="flash" id="osc-flash"><span></span></div>
+    <div class="row" style="justify-content:center;">
+      <button class="btn secondary" id="osc-reveal">Reveal</button>
+      <button class="btn good hidden" id="osc-got">Got it</button>
+      <button class="btn bad hidden" id="osc-missed">Missed it</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRAINING PLAN ================= -->
+<section id="tab-plan" class="tabpanel hidden">
+  <div class="panel">
+    <h2>Daily Plan: New Memory + Old Memory</h2>
+    <div class="sub">Two tracks, 5 minutes each, every day at 19:30. <b>New</b> = Cards &amp; PAO (novel material every session). <b>Old</b> = Oscars &amp; Mercury (stable facts, drilled by retrieval).</div>
+
+    <div style="background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:16px;">
+      <p style="margin:0 0 8px; font-weight:600;">The terminology, briefly</p>
+      <p style="margin:0 0 8px; color:var(--muted); font-size:14px; line-height:1.6;">Cognitive psychology splits long-term factual/experiential memory into two kinds: <b>episodic memory</b> (a specific, unrepeated event &mdash; this shuffled deck, this list of digits) and <b>semantic memory</b> (stable general knowledge with no particular "when" attached &mdash; who won Best Picture in 1994). Your "new" exercise trains fast <b>encoding</b> into episodic memory; your "old" exercise trains <b>retrieval practice</b> (repeated recall) against fixed semantic facts, the same mechanism spaced-repetition apps like Anki rely on.</p>
+    </div>
+
+    <div id="plan-week" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:20px;"></div>
+
+    <div style="background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:16px;">
+      <p style="margin:0 0 10px; font-weight:600;">How to run the 10 minutes (19:30 daily)</p>
+      <p style="margin:0 0 8px; color:var(--muted); font-size:14px; line-height:1.6;"><b>5 min &mdash; New (Cards &amp; PAO):</b> see the phase you're in below. Always untimed until noted otherwise; accuracy first.</p>
+      <p style="margin:0; color:var(--muted); font-size:14px; line-height:1.6;"><b>5 min &mdash; Old (Oscars &amp; Mercury):</b> open today's category shown above in the Oscars &amp; Mercury tab and run flashcards until the timer stops you. Missed cards reshuffle back into the deck automatically, so they'll resurface &mdash; that repetition is the point.</p>
+    </div>
+
+    <div style="background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 20px;">
+      <p style="margin:0 0 10px; font-weight:600;">New-memory phases (Cards &amp; PAO)</p>
+      <p style="margin:0 0 6px; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 1 (days 1&ndash;7):</b> My Systems &rarr; PAO Card System. Untimed lookup + flashcard quiz only. Goal: instant person+action+object recall for any card shown, no exceptions.</p>
+      <p style="margin:0 0 6px; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 2 (days 8&ndash;14):</b> Cards tab &mdash; shuffle a deck but only memorise the first 5 cards dealt, using your PAO images. Check recall. Once 3 days in a row are perfect, move to 10 cards.</p>
+      <p style="margin:0 0 6px; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 3 (weeks 3&ndash;4):</b> Grow to 15, then 20 cards, still untimed. Keep it bite-size &mdash; stop at your target count even if more of the deck is showing.</p>
+      <p style="margin:0; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 4 (month 2+):</b> Once 20 cards feels easy untimed, switch on the clock and start working toward the full 52-card deck &mdash; this is the actual WMC Speed Cards discipline. Track your personal best.</p>
+    </div>
+  </div>
+</section>
+
+<p class="footer-note">Progress is saved locally in this browser (localStorage) &mdash; it stays on this computer.</p>
+
+</main>
+
+<script>
+/* ============================================================
+   TAB NAVIGATION
+   ============================================================ */
+document.querySelectorAll('#tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tabpanel').forEach(p=>p.classList.add('hidden'));
+    document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
+  });
+});
+
+function loadBest(key){
+  try { return localStorage.getItem(key); } catch(e){ return null; }
+}
+function saveBest(key, val){
+  try { localStorage.setItem(key, val); } catch(e){ /* storage unavailable, ignore */ }
+}
+
+/* ============================================================
+   MODULE 1: RANDOM NUMBERS
+   ============================================================ */
+(function(){
+  let matrix = [];
+  let studying = false;
+  let timerInt = null;
+  let elapsed = 0;
+
+  const rowsSel = document.getElementById('num-rows');
+  const colsSel = document.getElementById('num-cols');
+  const studyArea = document.getElementById('num-study-area');
+  const recallArea = document.getElementById('num-recall-area');
+  const timerEl = document.getElementById('num-timer');
+  const startBtn = document.getElementById('num-start');
+  const recallBtn = document.getElementById('num-recall');
+  const checkBtn = document.getElementById('num-check');
+  const scoreEl = document.getElementById('num-score');
+
+  function fmt(s){
+    const m = Math.floor(s/60).toString().padStart(2,'0');
+    const sec = (s%60).toString().padStart(2,'0');
+    return m+':'+sec;
+  }
+
+  function generate(){
+    const rows = parseInt(rowsSel.value), cols = parseInt(colsSel.value);
+    matrix = [];
+    for(let r=0;r<rows;r++){
+      const row = [];
+      for(let c=0;c<cols;c++) row.push(Math.floor(Math.random()*10));
+      matrix.push(row);
+    }
+    studyArea.innerHTML = '';
+    recallArea.innerHTML = '';
+    scoreEl.textContent = '';
+    startBtn.disabled = false;
+    recallBtn.disabled = true;
+    clearInterval(timerInt);
+    elapsed = 0;
+    timerEl.textContent = '00:00';
+  }
+
+  function renderStudy(){
+    let html = '<div class="digit-grid">';
+    matrix.forEach(row=>{
+      html += '<div class="digit-row">';
+      row.forEach((d,i)=>{
+        html += '<span class="digit-static">'+d+'</span>';
+        if((i+1)%5===0) html += '&nbsp;&nbsp;';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    studyArea.innerHTML = html;
+  }
+
+  function renderRecall(){
+    let html = '';
+    matrix.forEach((row,ri)=>{
+      html += '<div class="digit-row">';
+      row.forEach((d,ci)=>{
+        html += '<input maxlength="1" class="digit-box" data-r="'+ri+'" data-c="'+ci+'">';
+      });
+      html += '</div>';
+    });
+    recallArea.innerHTML = html;
+    // auto-advance
+    const boxes = recallArea.querySelectorAll('.digit-box');
+    boxes.forEach((b,idx)=>{
+      b.addEventListener('input', ()=>{
+        if(b.value && idx+1<boxes.length) boxes[idx+1].focus();
+      });
+    });
+    if(boxes[0]) boxes[0].focus();
+  }
+
+  startBtn.addEventListener('click', ()=>{
+    if(matrix.length===0) generate();
+    renderStudy();
+    studying = true;
+    startBtn.disabled = true;
+    recallBtn.disabled = false;
+    clearInterval(timerInt);
+    timerInt = setInterval(()=>{ elapsed++; timerEl.textContent = fmt(elapsed); }, 1000);
+  });
+
+  recallBtn.addEventListener('click', ()=>{
+    clearInterval(timerInt);
+    studyArea.innerHTML = '';
+    recallBtn.disabled = true;
+    renderRecall();
+  });
+
+  document.getElementById('num-generate').addEventListener('click', generate);
+
+  recallArea.addEventListener('keydown', e=>{}); // placeholder
+
+  // check button lives inside dynamic area sometimes; use delegation via a persistent button in DOM
+  document.querySelector('#num-check') && document.querySelector('#num-check').remove();
+  const checkBtnPersistent = document.createElement('button');
+  checkBtnPersistent.className = 'btn good';
+  checkBtnPersistent.textContent = 'Check answers';
+  checkBtnPersistent.style.marginTop = '10px';
+  checkBtnPersistent.addEventListener('click', ()=>{
+    if(!recallArea.querySelector('.digit-box')) return;
+    let correct = 0, total = 0, rowScore = 0;
+    matrix.forEach((row,ri)=>{
+      let rowCorrectStreak = 0;
+      let broke = false;
+      row.forEach((d,ci)=>{
+        const input = recallArea.querySelector('[data-r="'+ri+'"][data-c="'+ci+'"]');
+        const val = input.value.trim();
+        total++;
+        if(val !== '' && parseInt(val) === d){
+          input.classList.add('correct'); input.classList.remove('wrong');
+          correct++;
+          if(!broke) rowCorrectStreak++;
+        } else {
+          input.classList.add('wrong'); input.classList.remove('correct');
+          broke = true;
+        }
+      });
+      rowScore += Math.floor(rowCorrectStreak/5)*5;
+    });
+    scoreEl.innerHTML = 'Digits correct: <b>'+correct+' / '+total+'</b> &nbsp;&middot;&nbsp; WMC-style score (5-digit blocks before first mistake, per row): <b>'+rowScore+'</b>';
+  });
+  recallArea.insertAdjacentElement('afterend', checkBtnPersistent);
+
+  generate();
+})();
+
+/* ============================================================
+   MODULE 2: SPEED CARDS
+   ============================================================ */
+(function(){
+  const SUITS = [{s:'♠',c:'black',name:'S'},{s:'♥',c:'red',name:'H'},{s:'♣',c:'black',name:'C'},{s:'♦',c:'red',name:'D'}];
+  const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+  let deck = []; // array of {rank,suit,label,color}
+  let studying = false;
+  let timerInt = null;
+  let startTime = null;
+  let recalled = [];
+
+  const studyArea = document.getElementById('cards-study-area');
+  const recallArea = document.getElementById('cards-recall-area');
+  const paletteEl = document.getElementById('cards-palette');
+  const recalledEl = document.getElementById('cards-recalled');
+  const timerEl = document.getElementById('cards-timer');
+  const bestEl = document.getElementById('cards-best');
+  const scoreEl = document.getElementById('cards-score');
+  const shuffleBtn = document.getElementById('cards-shuffle');
+  const startBtn = document.getElementById('cards-start');
+  const stopBtn = document.getElementById('cards-stop');
+  const checkBtn = document.getElementById('cards-check');
+  const undoBtn = document.getElementById('cards-undo');
+
+  function buildDeck(){
+    const d = [];
+    SUITS.forEach(su=>{
+      RANKS.forEach(r=>{
+        d.push({rank:r, suit:su.name, label:r+su.s, color:su.c});
+      });
+    });
+    return d;
+  }
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+  function chipHTML(card, idx){
+    return '<div class="card-chip '+card.color+'" data-idx="'+idx+'">'+card.label+'</div>';
+  }
+
+  function renderStudy(){
+    studyArea.innerHTML = deck.map((c,i)=>chipHTML(c,i)).join('');
+  }
+
+  function loadBestTime(){
+    const b = loadBest('cards_best_time');
+    bestEl.textContent = b ? (parseFloat(b).toFixed(1)+'s') : '–';
+  }
+
+  shuffleBtn.addEventListener('click', ()=>{
+    deck = shuffle(buildDeck());
+    renderStudy();
+    recallArea.classList.add('hidden');
+    scoreEl.textContent = '';
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    clearInterval(timerInt);
+    timerEl.textContent = '00.0s';
+  });
+
+  startBtn.addEventListener('click', ()=>{
+    startTime = Date.now();
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    timerInt = setInterval(()=>{
+      const t = (Date.now()-startTime)/1000;
+      timerEl.textContent = t.toFixed(1)+'s';
+    }, 100);
+  });
+
+  stopBtn.addEventListener('click', ()=>{
+    clearInterval(timerInt);
+    const finalTime = (Date.now()-startTime)/1000;
+    timerEl.textContent = finalTime.toFixed(1)+'s';
+    studyArea.innerHTML = '';
+    stopBtn.disabled = true;
+    recalled = [];
+    recalledEl.innerHTML = '';
+    // palette shown in a fixed neutral order (by suit/rank) so it's a recall test, not a copy
+    const paletteOrder = buildDeck();
+    paletteEl.innerHTML = paletteOrder.map((c,i)=>chipHTML(c,i)).join('');
+    recallArea.classList.remove('hidden');
+    paletteEl.querySelectorAll('.card-chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        const idx = chip.dataset.idx;
+        const card = paletteOrder[idx];
+        recalled.push(card);
+        chip.classList.add('used');
+        renderRecalled();
+      });
+    });
+    paletteEl.dataset.finalTime = finalTime;
+  });
+
+  function renderRecalled(){
+    recalledEl.innerHTML = recalled.map(c=>'<div class="card-chip '+c.color+'">'+c.label+'</div>').join('');
+  }
+
+  undoBtn.addEventListener('click', ()=>{
+    if(recalled.length===0) return;
+    const last = recalled.pop();
+    renderRecalled();
+    const chip = [...paletteEl.querySelectorAll('.card-chip')].find(c=>c.textContent===last.label && c.classList.contains('used'));
+    if(chip) chip.classList.remove('used');
+  });
+
+  checkBtn.addEventListener('click', ()=>{
+    let correctPos = 0;
+    let firstErrorAt = -1;
+    const n = Math.min(recalled.length, deck.length);
+    for(let i=0;i<deck.length;i++){
+      if(recalled[i] && recalled[i].label === deck[i].label){
+        correctPos++;
+      } else if(firstErrorAt===-1){
+        firstErrorAt = i+1;
+      }
+    }
+    const finalTime = parseFloat(paletteEl.dataset.finalTime || '0');
+    let msg = 'Recalled '+recalled.length+'/52 cards. Correct positions: <b>'+correctPos+' / 52</b>.';
+    if(firstErrorAt>0) msg += ' First mistake at card #'+firstErrorAt+'.';
+    else if(correctPos===52) msg += ' Perfect deck!';
+    scoreEl.innerHTML = msg;
+    if(correctPos===52){
+      const prevBest = parseFloat(loadBest('cards_best_time') || 'Infinity');
+      if(finalTime < prevBest){
+        saveBest('cards_best_time', finalTime);
+        loadBestTime();
+        scoreEl.innerHTML += ' <span class="best">New personal best!</span>';
+      }
+    }
+  });
+
+  loadBestTime();
+  deck = shuffle(buildDeck());
+  renderStudy();
+})();
+
+/* ============================================================
+   GENERIC FLASHCARD ENGINE (used by Dates, Nature, TKD)
+   ============================================================ */
+function makeFlashcards(opts){
+  // opts: prefix, dataProvider() -> [{front, back}], flashEl, revealBtn, gotBtn, missedBtn, scoreEl, bestEl, shuffleBtn
+  let deck = [];
+  let idx = 0;
+  let revealed = false;
+  let sessionCorrect = 0, sessionTotal = 0, streak = 0;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function loadBestStreak(){
+    const b = loadBest(opts.prefix+'_best_streak');
+    opts.bestEl.textContent = b ? b : '–';
+  }
+
+  function updateScoreDisplay(){
+    opts.scoreEl.textContent = sessionCorrect+'/'+sessionTotal;
+  }
+
+  function showCard(){
+    revealed = false;
+    if(idx >= deck.length){ idx = 0; }
+    const card = deck[idx];
+    opts.flashEl.innerHTML = '<span>'+card.front+'</span>';
+    opts.revealBtn.classList.remove('hidden');
+    opts.gotBtn.classList.add('hidden');
+    opts.missedBtn.classList.add('hidden');
+  }
+
+  function reveal(){
+    const card = deck[idx];
+    opts.flashEl.innerHTML = '<span class="tag">Answer</span><span>'+card.back+'</span>';
+    opts.revealBtn.classList.add('hidden');
+    opts.gotBtn.classList.remove('hidden');
+    opts.missedBtn.classList.remove('hidden');
+    revealed = true;
+  }
+
+  function next(correct){
+    sessionTotal++;
+    if(correct){ sessionCorrect++; streak++; }
+    else { streak = 0; }
+    const best = parseInt(loadBest(opts.prefix+'_best_streak') || '0');
+    if(streak > best){
+      saveBest(opts.prefix+'_best_streak', streak);
+      loadBestStreak();
+    }
+    updateScoreDisplay();
+    idx++;
+    if(idx >= deck.length){
+      deck = shuffle(deck);
+      idx = 0;
+    }
+    showCard();
+  }
+
+  opts.revealBtn.addEventListener('click', reveal);
+  opts.gotBtn.addEventListener('click', ()=>next(true));
+  opts.missedBtn.addEventListener('click', ()=>next(false));
+  if(opts.shuffleBtn){
+    opts.shuffleBtn.addEventListener('click', ()=>{
+      deck = shuffle(opts.dataProvider());
+      idx = 0;
+      sessionCorrect = 0; sessionTotal = 0; streak = 0;
+      updateScoreDisplay();
+      showCard();
+    });
+  }
+
+  loadBestStreak();
+  deck = shuffle(opts.dataProvider());
+  showCard();
+
+  return {
+    reload: function(){
+      deck = shuffle(opts.dataProvider());
+      idx = 0; sessionCorrect = 0; sessionTotal = 0; streak = 0;
+      updateScoreDisplay();
+      showCard();
+    }
+  };
+}
+
+/* ============================================================
+   MODULE 3: HISTORICAL DATES (real events)
+   ============================================================ */
+const HISTORICAL_DATES = [
+  ["776 BCE","First recorded Ancient Olympic Games held at Olympia"],
+  ["509 BCE","Founding of the Roman Republic"],
+  ["490 BCE","Battle of Marathon, Greeks defeat the Persians"],
+  ["336 BCE","Alexander the Great becomes King of Macedon"],
+  ["44 BCE","Assassination of Julius Caesar"],
+  ["27 BCE","Augustus becomes Rome's first emperor"],
+  ["79 CE","Eruption of Mount Vesuvius destroys Pompeii"],
+  ["313 CE","Edict of Milan grants religious tolerance in the Roman Empire"],
+  ["410 CE","Sack of Rome by the Visigoths"],
+  ["476 CE","Fall of the Western Roman Empire"],
+  ["622 CE","The Hijra: Muhammad migrates from Mecca to Medina"],
+  ["793 CE","Viking raid on the monastery of Lindisfarne"],
+  ["1066","Battle of Hastings; Norman conquest of England"],
+  ["1088","University of Bologna founded, oldest university in the world"],
+  ["1215","Magna Carta signed by King John of England"],
+  ["1271","Marco Polo sets out on his journey to Asia"],
+  ["1347","The Black Death arrives in Europe"],
+  ["1440","Gutenberg develops the printing press"],
+  ["1453","Fall of Constantinople to the Ottoman Empire"],
+  ["1492","Columbus reaches the Americas"],
+  ["1517","Martin Luther publishes his Ninety-Five Theses"],
+  ["1519","Magellan's expedition begins its circumnavigation of the globe"],
+  ["1543","Copernicus publishes his heliocentric theory"],
+  ["1588","England defeats the Spanish Armada"],
+  ["1607","Jamestown, the first permanent English colony in America, founded"],
+  ["1618","The Thirty Years' War begins"],
+  ["1665","The Great Plague of London"],
+  ["1666","The Great Fire of London"],
+  ["1687","Newton publishes the Principia Mathematica"],
+  ["1776","U.S. Declaration of Independence signed"],
+  ["1789","French Revolution begins with the storming of the Bastille"],
+  ["1804","Napoleon crowns himself Emperor of France"],
+  ["1815","Battle of Waterloo; Napoleon's final defeat"],
+  ["1848","Wave of revolutions across Europe"],
+  ["1859","Darwin publishes On the Origin of Species"],
+  ["1861","U.S. Civil War begins"],
+  ["1865","U.S. Civil War ends; Abraham Lincoln assassinated"],
+  ["1869","The Suez Canal opens"],
+  ["1876","Alexander Graham Bell patents the telephone"],
+  ["1903","The Wright brothers achieve the first powered flight"],
+  ["1912","The RMS Titanic sinks"],
+  ["1914","World War I begins"],
+  ["1917","The Russian Revolution"],
+  ["1918","World War I ends"],
+  ["1929","The Wall Street Crash triggers the Great Depression"],
+  ["1939","World War II begins"],
+  ["1945","World War II ends; atomic bombs dropped on Hiroshima and Nagasaki"],
+  ["1947","India gains independence from Britain"],
+  ["1949","The People's Republic of China is founded"],
+  ["1953","Watson and Crick describe the structure of DNA"],
+  ["1957","The Soviet Union launches Sputnik, the first satellite"],
+  ["1961","Yuri Gagarin becomes the first human in space"],
+  ["1963","Assassination of U.S. President John F. Kennedy"],
+  ["1969","Apollo 11: first crewed Moon landing"],
+  ["1989","Fall of the Berlin Wall"],
+  ["1991","Dissolution of the Soviet Union"],
+  ["2001","September 11 terrorist attacks in the United States"],
+];
+
+/* ============================================================
+   MODULE 4: NATURE FACTS
+   ============================================================ */
+const NATURE_FACTS = [
+  ["The largest animal ever known to have lived","The blue whale, larger than any known dinosaur"],
+  ["Number of hearts an octopus has","Three"],
+  ["What a group of crows is called","A murder"],
+  ["Why honey never spoils","Its low moisture and acidity prevent microbial growth if stored sealed"],
+  ["One of the fastest-growing plants on Earth","Certain bamboo species, up to ~91 cm (36 in) in a day"],
+  ["Which came first: sharks or trees?","Sharks; they predate trees by tens of millions of years"],
+  ["Where a shrimp's heart is located","In its head"],
+  ["Why sea otters hold hands while sleeping","To keep from drifting apart on the water"],
+  ["Botanically, is a strawberry a berry?","No &ndash; but bananas and avocados are true berries"],
+  ["How some turtles breathe underwater in winter","Through their cloaca (\"butt breathing\")"],
+  ["Which large mammal cannot jump","The elephant"],
+  ["How long a snail can sleep in one stretch","Up to three years"],
+  ["Shape of a wombat's droppings","Cube-shaped"],
+  ["Share of world's oxygen produced by the Amazon rainforest","Roughly one-fifth (~20%), often called 'the lungs of the Earth'"],
+  ["Color of a polar bear's skin under its fur","Black"],
+  ["Why flamingos are pink","Pigments from the algae and shrimp in their diet; they're born grey"],
+  ["What's unique about koala fingerprints","They're nearly identical to human fingerprints"],
+  ["Do cows form social bonds?","Yes &ndash; they form best-friend pairs and show stress when separated"],
+  ["How many color receptor types mantis shrimp can have","Up to 16 (humans have 3)"],
+  ["Do starfish have brains or blood?","No &ndash; they use a water vascular system instead"],
+  ["Roughly how old is the oldest known living tree","Over 4,800 years (a Great Basin bristlecone pine)"],
+  ["What's unusual about the Venus flytrap's trigger","It only closes after being touched twice within about 20 seconds"],
+  ["Do dolphins have names?","Yes &ndash; each develops a unique signature whistle used like a name"],
+  ["Which animal's males give birth?","Seahorses"],
+  ["What a group of flamingos is called","A flamboyance"],
+  ["Which jellyfish is considered biologically immortal","Turritopsis dohrnii"],
+  ["How much sleep giraffes need per day","As little as 5 to 30 minutes"],
+  ["Which desert is the largest in the world","Antarctica (a polar desert)"],
+  ["What tardigrades (water bears) can survive","Extreme heat, cold, radiation, and even the vacuum of space"],
+  ["How trees can share resources underground","Via mycorrhizal fungal networks connecting their roots"],
+  ["How fast a hummingbird's heart can beat in flight","Over 1,200 beats per minute"],
+  ["How long a saguaro cactus can live","Over 150 years"],
+  ["What axolotls can regenerate","Entire limbs, and parts of their heart and brain"],
+  ["What a group of owls is called","A parliament"],
+  ["Can kangaroos walk backwards?","No &ndash; their tail and leg structure prevent it"],
+  ["Where the world's largest known single organism is found","Oregon, USA &ndash; a honey fungus (Armillaria ostoyae) spanning miles"],
+  ["Do cheetahs roar?","No &ndash; they chirp, purr, and meow instead"],
+  ["Which animal can hold its breath longer than a dolphin","The sloth"],
+  ["What body part butterflies taste with","Their feet"],
+  ["What a group of pandas is called","An embarrassment"],
+  ["Do rats laugh?","Yes &ndash; they emit ultrasonic chirps when tickled"],
+  ["What a narwhal's \"horn\" actually is","An elongated tooth"],
+  ["What's remarkable about monarch butterfly migration","Multi-generational journeys of thousands of miles, though no single butterfly completes the round trip"],
+  ["What leafcutter ants do with the leaves they cut","Use them to farm a fungus, their actual food source"],
+  ["Can crows recognize human faces?","Yes &ndash; and they can remember them for years"],
+];
+
+/* ============================================================
+   MODULE 5: TKD THEORY (ITF)
+   ============================================================ */
+const TKD_PATTERNS = [
+  ["Chon-Ji","19","\"Heaven and Earth.\" The creation of the universe / beginning of human history. First pattern learned by beginners: low blocks and punches represent Earth, middle blocks and punches represent Heaven."],
+  ["Dan-Gun","21","Named after the legendary founder of Korea. Upward blocks and high punches symbolize his rise."],
+  ["Do-San","24","Pseudonym of patriot Ahn Chang-Ho. Knife-hand strikes and punches; the 24 movements reflect his life devoted to Korean education and independence."],
+  ["Won-Hyo","28","Named after the monk who introduced Buddhism to the Silla Dynasty. Emphasizes balance and control."],
+  ["Yul-Gok","38","Pseudonym of philosopher Yi-I, the \"Confucius of Korea.\" Palm strikes and low stances."],
+  ["Joong-Gun","32","Named after patriot An Jung-Geun, who assassinated Ito Hirobumi, first Japanese governor-general of Korea. Precise hand techniques and kicks."],
+  ["Toi-Gye","37","Pen name of neo-Confucian scholar Yi Hwang. Combination of hand strikes, blocks and stances."],
+  ["Hwa-Rang","29","Named after the Hwarang youth warrior group of the Silla Dynasty. High kicks and strikes."],
+  ["Choong-Moo","30","Pseudonym of Admiral Yi Sun-Sin, inventor of the first armored battleship (turtle ship). Fast, powerful techniques including a jump kick."],
+  ["Kwang-Gae","39","Named after King Kwang-Gae-Toh-Wang, 19th king of Koguryo, who reclaimed lost territories. Low stances and powerful strikes."],
+  ["Po-Eun","36","Named after scholar and poet Chong Mong-Ju. Emphasizes balance and precision."],
+  ["Gae-Baek","44","Named after General Gae-Baek of the Baekje Dynasty. Powerful hand techniques and stances."],
+  ["Eui-Am","45","Pen name of Son Byong-Hi, leader of the Korean independence movement. Fast, dynamic strikes and blocks."],
+  ["Choong-Jang","52","Named after General Kim Duk-Ryang. Combination of high kicks and hand techniques."],
+  ["Juche","45","Represents the philosophy that humans are masters of their own destiny; the diagram represents Mt. Paekdu."],
+  ["Sam-Il","33","Commemorates the March 1st, 1919 Korean independence movement (33 patriots who planned it)."],
+  ["Yoo-Sin","68","Named after General Kim Yoo-Sin of the Silla Dynasty, who helped unify Korea. Hand techniques, kicks and stances."],
+  ["Choi-Yong","46","Named after General Choi-Yong, loyal commander of the Koryo Dynasty. Strong, dynamic techniques."],
+  ["Yon-Gae","49","Named after General Yon-Gae Somoon of the Koguryo Dynasty. Powerful strikes and blocks."],
+  ["Ul-Ji","42","Named after General Ul-Ji Mun-Dok, who defended Korea against the Tang Dynasty. Balance and precision."],
+  ["Moon-Moo","61","Honors King Moon-Moo of Silla, who unified Korea. Dynamic, complex techniques."],
+  ["So-San","72","Pseudonym of the monk Choi Hyong-Ung, who raised monk soldiers to repel Japanese invaders."],
+  ["Se-Jong","24","Named after King Se-Jong, creator of the Korean alphabet (Hangul); 24 letters, 24 movements."],
+  ["Tong-Il","56","Represents the resolve for reunification of Korea. Final pattern in the ITF syllabus."],
+];
+
+const TKD_TERMS = {
+  general: [
+    ["Seogi","Stance"], ["Chagi","Kick"], ["Chigi","Strike"], ["Jireugi","Punch"], ["Makgi","Block"],
+    ["Charyot","Attention"], ["Kyongrye","Bow"], ["Sijak","Begin / start"], ["Kalyeo","Stop / break"],
+    ["Baro","Return to ready position"], ["Dobok","Uniform"], ["Ti","Belt"], ["Dojang","Training hall"],
+    ["Sabomnim","Instructor"], ["Poomse / Tul","Pattern"], ["Kihap","Spirit yell"], ["Kyorugi","Sparring"],
+    ["Hosinsul","Self-defense"], ["Joonbi","Ready"],
+  ],
+  stances: [
+    ["Joonbi Seogi","Ready stance"], ["Ap Seogi","Walking / front stance"], ["Ap Koobi Seogi","Forward (L-)stance"],
+    ["Dwit Koobi Seogi","Back stance"], ["Beom Seogi","Tiger stance"], ["Joochoom Seogi","Sitting stance"],
+  ],
+  kicks: [
+    ["Ap Chagi","Front snap kick"], ["Yeop Chagi","Side kick"], ["Dollyo Chagi","Turning (roundhouse) kick"],
+    ["Bandal Chagi","45-degree kick"], ["Bandae Dollyo Chagi","Reverse turning kick"], ["Naeryo Chagi","Axe kick"],
+    ["Twieo Chagi","Jumping kick"], ["Dwit Chagi","Back kick"], ["Hooryo Chagi","Hook kick"], ["Milyo Chagi","Pushing kick"],
+  ],
+  blocks: [
+    ["Eolgool Makki","High section block"], ["Momtong Makki","Middle section block"], ["Arae Makki","Low section block"],
+    ["Sonnal Makki","Knife-hand block"], ["Hechyo Makki","Wedging / spreading block"],
+    ["Momtong Bakkat Makki","Middle outer block"], ["Momtong An Makki","Middle inner block"],
+    ["Hansonnal Makki","Single knife-hand block"],
+  ],
+  strikes: [
+    ["Baro Jireugi","Obverse punch"], ["Bandae Jireugi","Reverse punch"], ["Naeryo Jireugi","Downward punch"],
+    ["Yeop Jireugi","Side punch"], ["Chi Jireugi","Uppercut punch"], ["Palkoop Chigi","Elbow strike"],
+    ["Deung Joomeok","Backfist"], ["Me Joomeok","Hammer fist"], ["Batangson Chigi","Palm heel strike"],
+    ["Pyonson Keut Chigi","Spear finger strike"],
+  ],
+  body: [
+    ["Son","Hand"], ["Joomeok","Fist"], ["Sonnal","Knife hand"], ["Palmok","Forearm / wrist"], ["Palkoop","Elbow"],
+    ["Dari","Leg"], ["Balnal","Foot blade"], ["Mooreup","Knee"], ["Momtong","Middle section (torso)"],
+    ["Eolgool","High section (face/head)"], ["Arae","Low section"],
+  ],
+  counting: [
+    ["Hana","One"], ["Dul","Two"], ["Set","Three"], ["Net","Four"], ["Dasot","Five"],
+    ["Yasot","Six"], ["Ilgop","Seven"], ["Yodol","Eight"], ["Ahop","Nine"], ["Yol","Ten"],
+  ],
+};
+
+/* ============================================================
+   WIRE UP DATES, NATURE, TKD
+   ============================================================ */
+function shuffleArr(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+// DATES
+makeFlashcards({
+  prefix: 'dates',
+  dataProvider: function(){
+    const dir = document.getElementById('dates-dir').value;
+    return HISTORICAL_DATES.map(([year,event])=>{
+      let d = dir;
+      if(d==='both') d = Math.random()<0.5 ? 'event' : 'year';
+      if(d==='year') return {front: year, back: event};
+      return {front: event, back: year};
+    });
+  },
+  flashEl: document.getElementById('dates-flash'),
+  revealBtn: document.getElementById('dates-reveal'),
+  gotBtn: document.getElementById('dates-got'),
+  missedBtn: document.getElementById('dates-missed'),
+  scoreEl: document.getElementById('dates-score-n'),
+  bestEl: document.getElementById('dates-best'),
+  shuffleBtn: document.getElementById('dates-shuffle'),
+});
+document.getElementById('dates-dir').addEventListener('change', ()=>{
+  document.getElementById('dates-shuffle').click();
+});
+
+// NATURE
+makeFlashcards({
+  prefix: 'nature',
+  dataProvider: function(){
+    return NATURE_FACTS.map(([q,a])=>({front:q, back:a}));
+  },
+  flashEl: document.getElementById('nature-flash'),
+  revealBtn: document.getElementById('nature-reveal'),
+  gotBtn: document.getElementById('nature-got'),
+  missedBtn: document.getElementById('nature-missed'),
+  scoreEl: document.getElementById('nature-score-n'),
+  bestEl: document.getElementById('nature-best'),
+  shuffleBtn: document.getElementById('nature-shuffle'),
+});
+
+// TKD
+const tkdCatWrap = document.getElementById('tkd-cat-wrap');
+const tkdDeckSel = document.getElementById('tkd-deck');
+let tkdActiveCats = new Set(Object.keys(TKD_TERMS));
+
+function renderTkdCats(){
+  tkdCatWrap.innerHTML = '';
+  if(tkdDeckSel.value !== 'terms'){ tkdCatWrap.classList.add('hidden'); return; }
+  tkdCatWrap.classList.remove('hidden');
+  Object.keys(TKD_TERMS).forEach(cat=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip-toggle' + (tkdActiveCats.has(cat) ? ' on' : '');
+    chip.textContent = cat;
+    chip.addEventListener('click', ()=>{
+      if(tkdActiveCats.has(cat)) tkdActiveCats.delete(cat); else tkdActiveCats.add(cat);
+      renderTkdCats();
+      tkdFlash.reload();
+    });
+    tkdCatWrap.appendChild(chip);
+  });
+}
+
+const tkdFlash = makeFlashcards({
+  prefix: 'tkd',
+  dataProvider: function(){
+    if(tkdDeckSel.value === 'patterns'){
+      return TKD_PATTERNS.map(([name,moves,meaning])=>({
+        front: name,
+        back: moves+' movements. '+meaning
+      }));
+    } else {
+      let pool = [];
+      tkdActiveCats.forEach(cat=>{ pool = pool.concat(TKD_TERMS[cat]); });
+      if(pool.length===0) pool = [["No categories selected","Toggle a category above"]];
+      return pool.map(([korean,eng])=>{
+        return Math.random()<0.5 ? {front:korean, back:eng} : {front:eng, back:korean};
+      });
+    }
+  },
+  flashEl: document.getElementById('tkd-flash'),
+  revealBtn: document.getElementById('tkd-reveal'),
+  gotBtn: document.getElementById('tkd-got'),
+  missedBtn: document.getElementById('tkd-missed'),
+  scoreEl: document.getElementById('tkd-score-n'),
+  bestEl: document.getElementById('tkd-best'),
+  shuffleBtn: document.getElementById('tkd-shuffle'),
+});
+
+tkdDeckSel.addEventListener('change', ()=>{
+  renderTkdCats();
+  tkdFlash.reload();
+});
+renderTkdCats();
+
+/* ============================================================
+   MY SYSTEMS: MAJOR SYSTEM, PAO CARDS, MEMORY PALACE
+   (pulled from the user's own Drive revision materials)
+   ============================================================ */
+const MAJOR_SINGLE = [
+["0","Soo / Zoo / Sea / Sue / Ace / Ice / Zia","S/Z"],["1","Hat / Tea / Dew / Tie / Doe / Toy / Hut","T/D"],["2","Hen / Noah / Knee / Gnu / Any / Inn / Noe","N"],["3","Ham / Ma / Moo / Amy / Emu / Ohm / Aim","M"],["4","Roo / Ray / Roe / Rye / Ore / Ear / Oar","R"],["5","Hill / Owl / Eel / Oil / Ale / Halo / Lily","L"],["6","Shoe / Jaw / Joy / Ash / Ache / Hue / Hay","J/SH"],["7","Cow / Key / Cue / Auk / Oak / Wig / Ago","K/G"],["8","View / Ivy / Fee / Ava / Hive / Ave / Foe","F/V"],["9","Bee / Bay / Pie / Boa / Bow / Ape / Hub","P/B"]
+];
+
+const MAJOR_DOUBLE = [
+["00","S.O.S. / Sassy / Seas / Zeus","S/Z – S/Z"],["01","Seed / Said / Suede / Sated","S/Z – T/D"],["02","Sun / Sunny / Seen / Sane","S/Z – N"],["03","Sim / Seam / Swim / Slim","S/Z – M"],["04","Zero / Sear / Czar","S/Z – R"],["05","Seal / Soul / Soil / Scale","S/Z – L"],["06","Sash / Sage / Susha / Ash","S/Z – J/SH"],["07","Sick / Sock / Sack / Ski","S/Z – K/G"],["08","Safe / Sofa / Savvy / Soave","S/Z – F/V"],["09","Soap / Sob / Spy","S/Z – P/B"],["10","Toes / Tads / Tides / Stead","T/D – S/Z"],["11","Dad / Teddy / Toted / Ditty","T/D – T/D"],["12","Tin / Tune / Titan / Dune","T/D – N"],["13","Dime / Totem / Timid / Dim","T/D – M"],["14","Tyre / Tower / Tudor / Deter","T/D – R"],["15","Doll / Toddle / Title / Dale","T/D – L"],["16","Tissue / Touch / Dacha / Teach","T/D – J/SH"],["17","Duck / Tack / Dig / Tag","T/D – K/G"],["18","Dove / Diva / Tough / Tuft","T/D – F/V"],["19","Tape / Tub / Tip / Top","T/D – P/B"],["20","Nose / Naos / Knees / Nice","N – S/Z"],["21","Net / Night / Neat / Gnat","N – T/D"],["22","Nun / Neon / Noon / Known-on","N – N"],["23","Gnome / Numb / Gnaw-m / Nimble","N – M"],["24","Nero / Nary / Nor / Near","N – R"],["25","Nail / Null / Kneel / Noel","N – L"],["26","Notch / Nudge / Enrich","N – J/SH"],["27","Neck / Nick / Nog / Knack","N – K/G"],["28","Knife / Navy / Naive / Knave","N – F/V"],["29","Knob / Nap / Nob / Snob","N – P/B"],["30","Mouse / Moose / Maze / Messy","M – S/Z"],["31","Mutt / Mud / Mite / Moated","M – T/D"],["32","Moon / Main / Men / Mane","M – N"],["33","Mum / Mama / Memo / Miami","M – M"],["34","Mower / Marry / More","M – R"],["35","Mule / Mall / Mail / Mile","M – L"],["36","Match / Mojo / Much / Mocha","M – J/SH"],["37","Mike / Mac / Mecca / Magic","M – K/G"],["38","Movie / Muff / Mafia / Move","M – F/V"],["39","Map / Mob / Mope / Imp","M – P/B"],["40","Rose / Race / Ruse / Rays","R – S/Z"],["41","Reed / Root / Rudder / Rated","R – T/D"],["42","Rain / Run / Ruin / Rein","R – N"],["43","Room / Rum / Roam / Ream","R – M"],["44","Aurora / Roar / Rear","R – R"],["45","Rail / Roll / Real / Rill","R – L"],["46","Rash / Rush / Rich / Arch","R – J/SH"],["47","Rock / Rug / Rake / Raga","R – K/G"],["48","Roof / Rave / Rife / Reef","R – F/V"],["49","Rope / Robe / Rib / Reap","R – P/B"],["50","Lice / Lose / Lass / Lazy","L – S/Z"],["51","Light / Lad / Loud / Lead","L – T/D"],["52","Lion / Lane / Lone / Lean","L – N"],["53","Lime / Loom / Lamb / Loam","L – M"],["54","Lair / Lore / Allure","L – R"],["55","Lilo / Lull / Lily / Lull","L – L"],["56","Leech / Leash / Lush / Lodge","L – J/SH"],["57","Lock / Lag / Log / Like","L – K/G"],["58","Lava / Luff / Leaf / Love","L – F/V"],["59","Lube / Lb / Lap / Lab","L – P/B"],["60","Cheese / Chess / Juice / Jazz","J/SH – S/Z"],["61","Sheet / Jet / Shade / Cheat","J/SH – T/D"],["62","Chain / Jane / Jean / Sheen","J/SH – N"],["63","Jam / Gem / Shim / Chime","J/SH – M"],["64","Cherry / Jar / Char / Shore","J/SH – R"],["65","Jelly / Gel / Chill / Cello","J/SH – L"],["66","Judge / Josh / Joshi / Jujube","J/SH – J/SH"],["67","Jock / Jack / Shock / Jug","J/SH – K/G"],["68","Chef / Java / Shiv / Chafe","J/SH – F/V"],["69","Ship / Chip / Jab / Chap","J/SH – P/B"],["70","Kiss / Gas / Case / Geese","K/G – S/Z"],["71","Cat / Coat / Gate / Goad","K/G – T/D"],["72","Can / Keen / Gun / Gain","K/G – N"],["73","Comb / Come / Game / Gum","K/G – M"],["74","Car / Core / Gear / Cure","K/G – R"],["75","Coal / Call / Cool / Goal","K/G – L"],["76","Cage / Gash / Cash","K/G – J/SH"],["77","Coke / Cake / Cook / Gig","K/G – K/G"],["78","Cave / Cafe / Gave / Gov","K/G – F/V"],["79","Cape / Cup / Gap","K/G – P/B"],["80","Fez / Face / Fuzzy / Fizz","F/V – S/Z"],["81","Fat / Feed / Feet / Fate","F/V – T/D"],["82","Fan / Phone / Fine / Fun","F/V – N"],["83","Foam / Fame / Film / Firm","F/V – M"],["84","Fire / Furry / Far / Ferry","F/V – R"],["85","File / Fall / Feel / Full","F/V – L"],["86","Fish / Fetch","F/V – J/SH"],["87","Fag / Fake / Fig / Fog","F/V – K/G"],["88","Fife / Vivid / Viva","F/V – F/V"],["89","Fab (lolly) / Fab / Fob","F/V – P/B"],["90","Bus / Base / Pace / Pass","P/B – S/Z"],["91","Bat / Bead / Boot / Boat","P/B – T/D"],["92","Pen / Bone / Pony / Bean","P/B – N"],["93","Opium / Bam / Bomb / Beam","P/B – M"],["94","Bear / Bar / Pear / Bore","P/B – R"],["95","Bell / Bail / Bowl / Boil","P/B – L"],["96","Bush / Badge / Beach / Push","P/B – J/SH"],["97","Book / Back / Bag / Buck","P/B – K/G"],["98","Beef / Buff / Pave","P/B – F/V"],["99","Pipe / Papa / Baby / Poop","P/B – P/B"]
+];
+
+const MAJOR_TRIPLE = [
+["000","Seizes","S/Z – S/Z – S/Z"],["001","Seized","S/Z – S/Z – T/D"],["002","Seizing","S/Z – S/Z – N"],["003","Seism","S/Z – S/Z – M"],["004","Seizer","S/Z – S/Z – R"],["005","Sizzle","S/Z – S/Z – L"],["006","Sausage","S/Z – S/Z – J/SH"],["007","Sussex","S/Z – S/Z – K/G"],["008","Sizeoff","S/Z – S/Z – F/V"],["009","Seize-up","S/Z – S/Z – P/B"],["010","Stews","S/Z – T/D – S/Z"],["011","Studio","S/Z – T/D – T/D"],["012","Steins","S/Z – T/D – N"],["013","Steam","S/Z – T/D – M"],["014","Stir","S/Z – T/D – R"],["015","Stool","S/Z – T/D – L"],["016","Stitch","S/Z – T/D – J/SH"],["017","Stick","S/Z – T/D – K/G"],["018","Stove","S/Z – T/D – F/V"],["019","Stoop","S/Z – T/D – P/B"],["020","Snooze","S/Z – N – S/Z"],["021","Snout","S/Z – N – T/D"],["022","Snoring","S/Z – N – N"],["023","Snowman","S/Z – N – M"],["024","Snore","S/Z – N – R"],["025","Snail","S/Z – N – L"],["026","Snatch","S/Z – N – J/SH"],["027","Snack","S/Z – N – K/G"],["028","Sniff","S/Z – N – F/V"],["029","Snap","S/Z – N – P/B"],["030","Smooze","S/Z – M – S/Z"],["031","Smite","S/Z – M – T/D"],["032","Summon","S/Z – M – N"],["033","Simoom","S/Z – M – M"],["034","Smear","S/Z – M – R"],["035","Small","S/Z – M – L"],["036","Smash","S/Z – M – J/SH"],["037","Smock","S/Z – M – K/G"],["038","Semaphore","S/Z – M – F/V"],["039","Simp","S/Z – M – P/B"],["040","Soars","S/Z – R – S/Z"],["041","Sort","S/Z – R – T/D"],["042","Siren","S/Z – R – N"],["043","Serum","S/Z – R – M"],["044","Sorrow","S/Z – R – R"],["045","Sorrel","S/Z – R – L"],["046","Surge","S/Z – R – J/SH"],["047","Sark","S/Z – R – K/G"],["048","Serf","S/Z – R – F/V"],["049","Syrup","S/Z – R – P/B"],["050","Salsa","S/Z – L – S/Z"],["051","Salt","S/Z – L – T/D"],["052","Salon","S/Z – L – N"],["053","Slim","S/Z – L – M"],["054","Slur","S/Z – L – R"],["055","Solely","S/Z – L – L"],["056","Slouch","S/Z – L – J/SH"],["057","Slack","S/Z – L – K/G"],["058","Sleeve","S/Z – L – F/V"],["059","Slap","S/Z – L – P/B"],["060","Sages","S/Z – J/SH – S/Z"],["061","Sachet","S/Z – J/SH – T/D"],["062","Session","S/Z – J/SH – N"],["063","Satchmo","S/Z – J/SH – M"],["064","Sacher","S/Z – J/SH – R"],["065","Social","S/Z – J/SH – L"],["066","Sissyjig","S/Z – J/SH – J/SH"],["067","Seajack","S/Z – J/SH – K/G"],["068","Schafer","S/Z – J/SH – F/V"],["069","Seachop","S/Z – J/SH – P/B"],["070","Sacs","S/Z – K/G – S/Z"],["071","Scout","S/Z – K/G – T/D"],["072","Scan","S/Z – K/G – N"],["073","Scam","S/Z – K/G – M"],["074","Scar","S/Z – K/G – R"],["075","Skull","S/Z – K/G – L"],["076","Squash","S/Z – K/G – J/SH"],["077","Sukkah","S/Z – K/G – K/G"],["078","Scoff","S/Z – K/G – F/V"],["079","Scoop","S/Z – K/G – P/B"],["080","Saves","S/Z – F/V – S/Z"],["081","Soviet","S/Z – F/V – T/D"],["082","Savanna","S/Z – F/V – N"],["083","Save-me","S/Z – F/V – M"],["084","Safari","S/Z – F/V – R"],["085","Civil","S/Z – F/V – L"],["086","Savage","S/Z – F/V – J/SH"],["087","Civic","S/Z – F/V – K/G"],["088","Suavify","S/Z – F/V – F/V"],["089","Save-up","S/Z – F/V – P/B"],["090","Spews","S/Z – P/B – S/Z"],["091","Spit","S/Z – P/B – T/D"],["092","Spain","S/Z – P/B – N"],["093","Spam","S/Z – P/B – M"],["094","Spare","S/Z – P/B – R"],["095","Spell","S/Z – P/B – L"],["096","Speech","S/Z – P/B – J/SH"],["097","Speck","S/Z – P/B – K/G"],["098","Spoof","S/Z – P/B – F/V"],["099","Sub-pop","S/Z – P/B – P/B"],["100","Daisies","T/D – S/Z – S/Z"],["101","Toast","T/D – S/Z – T/D"],["102","Tins","T/D – S/Z – N"],["103","Toe-seam","T/D – S/Z – M"],["104","Desire","T/D – S/Z – R"],["105","Diesel","T/D – S/Z – L"],["106","Dosage","T/D – S/Z – J/SH"],["107","Disk","T/D – S/Z – K/G"],["108","Toss-off","T/D – S/Z – F/V"],["109","Toss-up","T/D – S/Z – P/B"],["110","Toads","T/D – T/D – S/Z"],["111","Tooted","T/D – T/D – T/D"],["112","Titan","T/D – T/D – N"],["113","Totem","T/D – T/D – M"],["114","Tatter","T/D – T/D – R"],["115","Tidal","T/D – T/D – L"],["116","Detach","T/D – T/D – J/SH"],["117","Toot-cake","T/D – T/D – K/G"],["118","Tattiff","T/D – T/D – F/V"],["119","Tit-tap","T/D – T/D – P/B"],["120","Tons","T/D – N – S/Z"],["121","Tinned","T/D – N – T/D"],["122","Tenon","T/D – N – N"],["123","Denim","T/D – N – M"],["124","Tinner","T/D – N – R"],["125","Tunnel","T/D – N – L"],["126","Tench","T/D – N – J/SH"],["127","Tank","T/D – N – K/G"],["128","Tonify","T/D – N – F/V"],["129","Danube","T/D – N – P/B"],["130","Dimes","T/D – M – S/Z"],["131","Dammit","T/D – M – T/D"],["132","Demon","T/D – M – N"],["133","Demi-mime","T/D – M – M"],["134","Tamari","T/D – M – R"],["135","Tamil","T/D – M – L"],["136","Damage","T/D – M – J/SH"],["137","Dumbuck","T/D – M – K/G"],["138","Dumphy","T/D – M – F/V"],["139","Damp","T/D – M – P/B"],["140","Dares","T/D – R – S/Z"],["141","Dirt","T/D – R – T/D"],["142","Drain","T/D – R – N"],["143","Drum","T/D – R – M"],["144","Direr","T/D – R – R"],["145","Drill","T/D – R – L"],["146","Dirge","T/D – R – J/SH"],["147","Dark","T/D – R – K/G"],["148","Drive","T/D – R – F/V"],["149","Drop","T/D – R – P/B"],["150","Dolls","T/D – L – S/Z"],["151","Dealt","T/D – L – T/D"],["152","Talon","T/D – L – N"],["153","Dolma","T/D – L – M"],["154","Dollar","T/D – L – R"],["155","Dilly","T/D – L – L"],["156","Delish","T/D – L – J/SH"],["157","Tilak","T/D – L – K/G"],["158","Delve","T/D – L – F/V"],["159","Dollop","T/D – L – P/B"],["160","Duchess","T/D – J/SH – S/Z"],["161","Digit","T/D – J/SH – T/D"],["162","Touching","T/D – J/SH – N"],["163","Duchamp","T/D – J/SH – M"],["164","Ditcher","T/D – J/SH – R"],["165","Dejal","T/D – J/SH – L"],["166","Dodge-jig","T/D – J/SH – J/SH"],["167","Dejack","T/D – J/SH – K/G"],["168","Digify","T/D – J/SH – F/V"],["169","Dog-pub","T/D – J/SH – P/B"],["170","Digs","T/D – K/G – S/Z"],["171","Tact","T/D – K/G – T/D"],["172","Token","T/D – K/G – N"],["173","Dogma","T/D – K/G – M"],["174","Docker","T/D – K/G – R"],["175","Tickle","T/D – K/G – L"],["176","Dachau","T/D – K/G – J/SH"],["177","Doc-coke","T/D – K/G – K/G"],["178","Dakof","T/D – K/G – F/V"],["179","Teacup","T/D – K/G – P/B"],["180","Dives","T/D – F/V – S/Z"],["181","Devout","T/D – F/V – T/D"],["182","Divan","T/D – F/V – N"],["183","Doveham","T/D – F/V – M"],["184","Diver","T/D – F/V – R"],["185","Devil","T/D – F/V – L"],["186","Tavish","T/D – F/V – J/SH"],["187","Davock","T/D – F/V – K/G"],["188","Dove-vow","T/D – F/V – F/V"],["189","Davap","T/D – F/V – P/B"],["190","Dubious","T/D – P/B – S/Z"],["191","Debate","T/D – P/B – T/D"],["192","Tip-on","T/D – P/B – N"],["193","Tub-mould","T/D – P/B – M"],["194","Diaper","T/D – P/B – R"],["195","Tipple","T/D – P/B – L"],["196","Debauch","T/D – P/B – J/SH"],["197","Topic","T/D – P/B – K/G"],["198","Top-off","T/D – P/B – F/V"],["199","Tabby-pub","T/D – P/B – P/B"],["200","Noises","N – S/Z – S/Z"],["201","Nasty","N – S/Z – T/D"],["202","Neon","N – S/Z – N"],["203","Gnome","N – S/Z – M"],["204","Narrow","N – S/Z – R"],["205","Novel","N – S/Z – L"],["206","Notch","N – S/Z – J/SH"],["207","Noggin","N – S/Z – K/G"],["208","Knife","N – S/Z – F/V"],["209","Knob","N – S/Z – P/B"],["210","Knits","N – T/D – S/Z"],["211","Knotted","N – T/D – T/D"],["212","Ninety","N – T/D – N"],["213","Nighttime","N – T/D – M"],["214","Natter","N – T/D – R"],["215","Nettle","N – T/D – L"],["216","Natch","N – T/D – J/SH"],["217","Knick","N – T/D – K/G"],["218","Native","N – T/D – F/V"],["219","Nip","N – T/D – P/B"],["220","Nuns","N – N – S/Z"],["221","Ninety","N – N – T/D"],["222","Onion","N – N – N"],["223","Gnome-gem","N – N – M"],["224","Manner","N – N – R"],["225","Inner","N – N – L"],["226","Nudge","N – N – J/SH"],["227","Nugget","N – N – K/G"],["228","Inflow","N – N – F/V"],["229","Ninepins","N – N – P/B"],["230","Names","N – M – S/Z"],["231","Nymph","N – M – T/D"],["232","Gnomon","N – M – N"],["233","Nimrim","N – M – M"],["234","Nomad","N – M – R"],["235","Nimble","N – M – L"],["236","Nacho","N – M – J/SH"],["237","Compact","N – M – K/G"],["238","Nymph","N – M – F/V"],["239","Knob","N – M – P/B"],["240","Norris","N – R – S/Z"],["241","Nadir","N – R – T/D"],["242","Narrow","N – R – N"],["243","Norm","N – R – M"],["244","Norroy","N – R – R"],["245","Nurl","N – R – L"],["246","Norwich","N – R – J/SH"],["247","Enrich","N – R – K/G"],["248","Nerve","N – R – F/V"],["249","Narrow-pub","N – R – P/B"],["250","Nails","N – L – S/Z"],["251","Noodle","N – L – T/D"],["252","Nolan","N – L – N"],["253","Normalize","N – L – M"],["254","Nullar","N – L – R"],["255","Nullify","N – L – L"],["256","Enlarge","N – L – J/SH"],["257","Unlucky","N – L – K/G"],["258","Valve","N – L – F/V"],["259","Nope","N – L – P/B"],["260","Judges","N – J/SH – S/Z"],["261","Notion","N – J/SH – T/D"],["262","Ninja","N – J/SH – N"],["263","Jungle","N – J/SH – M"],["264","Anchor","N – J/SH – R"],["265","Angel","N – J/SH – L"],["266","Jungle-judge","N – J/SH – J/SH"],["267","Nacho-cake","N – J/SH – K/G"],["268","Jingle","N – J/SH – F/V"],["269","Knap-pub","N – J/SH – P/B"],["270","Knocks","N – K/G – S/Z"],["271","Naked","N – K/G – T/D"],["272","Noggin","N – K/G – N"],["273","Enigma","N – K/G – M"],["274","Gnocchi","N – K/G – R"],["275","Giggle","N – K/G – L"],["276","Knockage","N – K/G – J/SH"],["277","Nocturne","N – K/G – K/G"],["278","Knave-fig","N – K/G – F/V"],["279","Nickel","N – K/G – P/B"],["280","Knives","N – F/V – S/Z"],["281","Nipped","N – F/V – T/D"],["282","Oven","N – F/V – N"],["283","Infirm","N – F/V – M"],["284","Envisage","N – F/V – R"],["285","Novel-film","N – F/V – L"],["286","Nifty","N – F/V – J/SH"],["287","Invoke","N – F/V – K/G"],["288","Navy-vibe","N – F/V – F/V"],["289","Nimble-pub","N – F/V – P/B"],["290","Knobs","N – P/B – S/Z"],["291","Nibble","N – P/B – T/D"],["292","Napkin","N – P/B – N"],["293","Nimble-mom","N – P/B – M"],["294","Nibble-roo","N – P/B – R"],["295","Nipple","N – P/B – L"],["296","Nab-bush","N – P/B – J/SH"],["297","Knob-cage","N – P/B – K/G"],["298","Knave","N – P/B – F/V"],["299","Napper","N – P/B – P/B"],["300","Moose","M – S/Z – S/Z"],["301","Mist","M – S/Z – T/D"],["302","Mason","M – S/Z – N"],["303","Mammogram","M – S/Z – M"],["304","Mirror","M – S/Z – R"],["305","Mail","M – S/Z – L"],["306","Massage","M – S/Z – J/SH"],["307","Mosaic","M – S/Z – K/G"],["308","Mafia","M – S/Z – F/V"],["309","Mob-pub","M – S/Z – P/B"],["310","Mudslide","M – T/D – S/Z"],["311","Matted","M – T/D – T/D"],["312","Mutton","M – T/D – N"],["313","Madam","M – T/D – M"],["314","Motor","M – T/D – R"],["315","Metal","M – T/D – L"],["316","Match","M – T/D – J/SH"],["317","Medic","M – T/D – K/G"],["318","Modify","M – T/D – F/V"],["319","Mudpie","M – T/D – P/B"],["320","Moans","M – N – S/Z"],["321","Mint","M – N – T/D"],["322","Mammish","M – N – N"],["323","Magma","M – N – M"],["324","Minor","M – N – R"],["325","Mental","M – N – L"],["326","Munch","M – N – J/SH"],["327","Maniac","M – N – K/G"],["328","Manifest","M – N – F/V"],["329","Minimap","M – N – P/B"],["330","Mamma","M – M – S/Z"],["331","Mammoth","M – M – T/D"],["332","Moo-moon","M – M – N"],["333","Mum-mum","M – M – M"],["334","Ammer","M – M – R"],["335","Mammal","M – M – L"],["336","Mammoth-wash","M – M – J/SH"],["337","Mama-cake","M – M – K/G"],["338","Mammiff","M – M – F/V"],["339","Mam-mob","M – M – P/B"],["340","Mares","M – R – S/Z"],["341","Mort","M – R – T/D"],["342","Moron","M – R – N"],["343","Mirage","M – R – M"],["344","Merger","M – R – R"],["345","Moral","M – R – L"],["346","Marsh","M – R – J/SH"],["347","Marco","M – R – K/G"],["348","Morph","M – R – F/V"],["349","Marble","M – R – P/B"],["350","Males","M – L – S/Z"],["351","Melt","M – L – T/D"],["352","Melon","M – L – N"],["353","Malm","M – L – M"],["354","Molar","M – L – R"],["355","Mullet","M – L – L"],["356","Mulch","M – L – J/SH"],["357","Melt-cake","M – L – K/G"],["358","Malef","M – L – F/V"],["359","Melba","M – L – P/B"],["360","Miches","M – J/SH – S/Z"],["361","Midget","M – J/SH – T/D"],["362","Magic","M – J/SH – N"],["363","Major-mob","M – J/SH – M"],["364","Marjoram","M – J/SH – R"],["365","Magical","M – J/SH – L"],["366","Magic-judge","M – J/SH – J/SH"],["367","Majok","M – J/SH – K/G"],["368","Mujahedeen","M – J/SH – F/V"],["369","Mushroom-pub","M – J/SH – P/B"],["370","Mags","M – K/G – S/Z"],["371","Magnet","M – K/G – T/D"],["372","Mocha","M – K/G – N"],["373","Mugger","M – K/G – M"],["374","Major","M – K/G – R"],["375","Mogul","M – K/G – L"],["376","Cage-mob","M – K/G – J/SH"],["377","Mock-cake","M – K/G – K/G"],["378","Mag-fig","M – K/G – F/V"],["379","Magic-pub","M – K/G – P/B"],["380","Mafias","M – F/V – S/Z"],["381","Muffled","M – F/V – T/D"],["382","Maven","M – F/V – N"],["383","Movify","M – F/V – M"],["384","Manoeuvre","M – F/V – R"],["385","Marvel","M – F/V – L"],["386","Misbehave","M – F/V – J/SH"],["387","Maverick","M – F/V – K/G"],["388","Move-vibe","M – F/V – F/V"],["389","Mob-pub","M – F/V – P/B"],["390","Mobs","M – P/B – S/Z"],["391","Mapped","M – P/B – T/D"],["392","Mabon","M – P/B – N"],["393","Bamboo","M – P/B – M"],["394","Mopper","M – P/B – R"],["395","Mumble","M – P/B – L"],["396","Mob-bush","M – P/B – J/SH"],["397","Mob-cage","M – P/B – K/G"],["398","Mafia-vibe","M – P/B – F/V"],["399","Muppet","M – P/B – P/B"],["400","Roses","R – S/Z – S/Z"],["401","Roast","R – S/Z – T/D"],["402","Raisin","R – S/Z – N"],["403","Racism","R – S/Z – M"],["404","Razor","R – S/Z – R"],["405","Rascal","R – S/Z – L"],["406","Rash","R – S/Z – J/SH"],["407","Rascally","R – S/Z – K/G"],["408","Rustle","R – S/Z – F/V"],["409","Rasp","R – S/Z – P/B"],["410","Raids","R – T/D – S/Z"],["411","Rotted","R – T/D – T/D"],["412","Rotten","R – T/D – N"],["413","Rhythm","R – T/D – M"],["414","Radar","R – T/D – R"],["415","Rattle","R – T/D – L"],["416","Retch","R – T/D – J/SH"],["417","Ridgecake","R – T/D – K/G"],["418","Retool","R – T/D – F/V"],["419","Ration","R – T/D – P/B"],["420","Ruins","R – N – S/Z"],["421","Rant","R – N – T/D"],["422","Raining","R – N – N"],["423","Runway","R – N – M"],["424","Runner","R – N – R"],["425","Rental","R – N – L"],["426","Ranch","R – N – J/SH"],["427","Rank","R – N – K/G"],["428","Roughneck","R – N – F/V"],["429","Runabout","R – N – P/B"],["430","Rims","R – M – S/Z"],["431","Remit","R – M – T/D"],["432","Ramon","R – M – N"],["433","Ream-mob","R – M – M"],["434","Roamer","R – M – R"],["435","Rumble","R – M – L"],["436","Rummage","R – M – J/SH"],["437","Remark","R – M – K/G"],["438","Rampage","R – M – F/V"],["439","Ramp","R – M – P/B"],["440","Roarers","R – R – S/Z"],["441","Resort","R – R – T/D"],["442","Raisin","R – R – N"],["443","Rearmour","R – R – M"],["444","Roar-roar","R – R – R"],["445","Rural","R – R – L"],["446","Harsh","R – R – J/SH"],["447","Ruckus","R – R – K/G"],["448","Rooftop","R – R – F/V"],["449","Revamp","R – R – P/B"],["450","Rails","R – L – S/Z"],["451","Result","R – L – T/D"],["452","Relic","R – L – N"],["453","Realm","R – L – M"],["454","Roller","R – L – R"],["455","Lilypad","R – L – L"],["456","Relish","R – L – J/SH"],["457","Relic-key","R – L – K/G"],["458","Relive","R – L – F/V"],["459","Rollup","R – L – P/B"],["460","Rashes","R – J/SH – S/Z"],["461","Urchin","R – J/SH – T/D"],["462","Wrench","R – J/SH – N"],["463","Regime","R – J/SH – M"],["464","Archer","R – J/SH – R"],["465","Racial","R – J/SH – L"],["466","Urchin-judge","R – J/SH – J/SH"],["467","Reach","R – J/SH – K/G"],["468","Ratchet","R – J/SH – F/V"],["469","Righteous-pub","R – J/SH – P/B"],["470","Rocks","R – K/G – S/Z"],["471","Rocket","R – K/G – T/D"],["472","Rogue","R – K/G – N"],["473","Ragged","R – K/G – M"],["474","Rocker","R – K/G – R"],["475","Recall","R – K/G – L"],["476","Ruckus","R – K/G – J/SH"],["477","Rickshaw","R – K/G – K/G"],["478","Rickety","R – K/G – F/V"],["479","Rock-pub","R – K/G – P/B"],["480","Raves","R – F/V – S/Z"],["481","Lifted","R – F/V – T/D"],["482","Raven","R – F/V – N"],["483","Roofbeam","R – F/V – M"],["484","Revere","R – F/V – R"],["485","Ravel","R – F/V – L"],["486","Ravish","R – F/V – J/SH"],["487","Revoke","R – F/V – K/G"],["488","Ravify","R – F/V – F/V"],["489","Revamp","R – F/V – P/B"],["490","Robs","R – P/B – S/Z"],["491","Rapid","R – P/B – T/D"],["492","Ribbon","R – P/B – N"],["493","Rampant","R – P/B – M"],["494","Rubber","R – P/B – R"],["495","Ripple","R – P/B – L"],["496","Rubbish","R – P/B – J/SH"],["497","Rubick","R – P/B – K/G"],["498","Riff","R – P/B – F/V"],["499","Piper","R – P/B – P/B"],["500","Losses","L – S/Z – S/Z"],["501","Lusty","L – S/Z – T/D"],["502","Lesson","L – S/Z – N"],["503","Lissome","L – S/Z – M"],["504","Laser","L – S/Z – R"],["505","Lacy","L – S/Z – L"],["506","Lash","L – S/Z – J/SH"],["507","Lozenge","L – S/Z – K/G"],["508","Lovish","L – S/Z – F/V"],["509","Lastpub","L – S/Z – P/B"],["510","Lads","L – T/D – S/Z"],["511","Loaded","L – T/D – T/D"],["512","Latten","L – T/D – N"],["513","Luted","L – T/D – M"],["514","Liter","L – T/D – R"],["515","Lidded","L – T/D – L"],["516","Latch","L – T/D – J/SH"],["517","Logic","L – T/D – K/G"],["518","Ledge-off","L – T/D – F/V"],["519","Letup","L – T/D – P/B"],["520","Lends","L – N – S/Z"],["521","Loin","L – N – T/D"],["522","Linnet","L – N – N"],["523","Lungsome","L – N – M"],["524","Liner","L – N – R"],["525","Lingual","L – N – L"],["526","Lunch","L – N – J/SH"],["527","Languid","L – N – K/G"],["528","Longwave","L – N – F/V"],["529","Lineup","L – N – P/B"],["530","Limbs","L – M – S/Z"],["531","Limit","L – M – T/D"],["532","Lemon","L – M – N"],["533","Lime-mob","L – M – M"],["534","Lumber","L – M – R"],["535","Limy","L – M – L"],["536","Lummox","L – M – J/SH"],["537","Limeade","L – M – K/G"],["538","Lymph","L – M – F/V"],["539","Lamp","L – M – P/B"],["540","Lurks","L – R – S/Z"],["541","Alert","L – R – T/D"],["542","Alarm","L – R – N"],["543","Allarm","L – R – M"],["544","Allurer","L – R – R"],["545","Lure","L – R – L"],["546","Lurch","L – R – J/SH"],["547","Larick","L – R – K/G"],["548","Larva","L – R – F/V"],["549","Larp","L – R – P/B"],["550","Lilacs","L – L – S/Z"],["551","Littlest","L – L – T/D"],["552","Llano","L – L – N"],["553","Llama","L – L – M"],["554","Lullar","L – L – R"],["555","Lilac","L – L – L"],["556","Lollipop","L – L – J/SH"],["557","Lollygag","L – L – K/G"],["558","Lullaby","L – L – F/V"],["559","Lollipop-pub","L – L – P/B"],["560","Leaches","L – J/SH – S/Z"],["561","Legit","L – J/SH – T/D"],["562","Legion","L – J/SH – N"],["563","Logiam","L – J/SH – M"],["564","Legume","L – J/SH – R"],["565","Local","L – J/SH – L"],["566","Leech-judge","L – J/SH – J/SH"],["567","Legwork","L – J/SH – K/G"],["568","Achieve","L – J/SH – F/V"],["569","Ship-pub","L – J/SH – P/B"],["570","Looks","L – K/G – S/Z"],["571","Locker","L – K/G – T/D"],["572","Logician","L – K/G – N"],["573","Locum","L – K/G – M"],["574","Local","L – K/G – R"],["575","Logic","L – K/G – L"],["576","Lockage","L – K/G – J/SH"],["577","Lackey","L – K/G – K/G"],["578","Lockwife","L – K/G – F/V"],["579","Lockbox","L – K/G – P/B"],["580","Loves","L – F/V – S/Z"],["581","Loftiest","L – F/V – T/D"],["582","Raven","L – F/V – N"],["583","Lovesome","L – F/V – M"],["584","Lever","L – F/V – R"],["585","Level","L – F/V – L"],["586","Lovage","L – F/V – J/SH"],["587","Lavish","L – F/V – K/G"],["588","Lava-vibe","L – F/V – F/V"],["589","(no word)","L – F/V – P/B"],["590","Labs","L – P/B – S/Z"],["591","Wept","L – P/B – T/D"],["592","Lapin","L – P/B – N"],["593","Lap-mob","L – P/B – M"],["594","Lapboard","L – P/B – R"],["595","People","L – P/B – L"],["596","Lap-bush","L – P/B – J/SH"],["597","Lapack","L – P/B – K/G"],["598","(no word)","L – P/B – F/V"],["599","Lapdog","L – P/B – P/B"],["600","Judges","J/SH – S/Z – S/Z"],["601","Juiced","J/SH – S/Z – T/D"],["602","Jason","J/SH – S/Z – N"],["603","Scheme","J/SH – S/Z – M"],["604","Sheer","J/SH – S/Z – R"],["605","Chill","J/SH – S/Z – L"],["606","Juggle","J/SH – S/Z – J/SH"],["607","Jocund","J/SH – S/Z – K/G"],["608","Shiver","J/SH – S/Z – F/V"],["609","Shipwreck","J/SH – S/Z – P/B"],["610","Jades","J/SH – T/D – S/Z"],["611","Jutted","J/SH – T/D – T/D"],["612","Jeton","J/SH – T/D – N"],["613","Jaundiced","J/SH – T/D – M"],["614","Jester","J/SH – T/D – R"],["615","Gentle","J/SH – T/D – L"],["616","Chapter","J/SH – T/D – J/SH"],["617","Gothic","J/SH – T/D – K/G"],["618","Shudder","J/SH – T/D – F/V"],["619","Shed-pub","J/SH – T/D – P/B"],["620","Genies","J/SH – N – S/Z"],["621","Giant","J/SH – N – T/D"],["622","Genuine","J/SH – N – N"],["623","Genome","J/SH – N – M"],["624","Goner","J/SH – N – R"],["625","Angel","J/SH – N – L"],["626","Jungle","J/SH – N – J/SH"],["627","Genius","J/SH – N – K/G"],["628","Genuine-vibe","J/SH – N – F/V"],["629","Jenny","J/SH – N – P/B"],["630","Shambles","J/SH – M – S/Z"],["631","Cement","J/SH – M – T/D"],["632","Summon","J/SH – M – N"],["633","Shammy","J/SH – M – M"],["634","Shoemaker","J/SH – M – R"],["635","Channel","J/SH – M – L"],["636","Shimmer","J/SH – M – J/SH"],["637","Shamrock","J/SH – M – K/G"],["638","Chef","J/SH – M – F/V"],["639","Chomp","J/SH – M – P/B"],["640","Shirks","J/SH – R – S/Z"],["641","Short","J/SH – R – T/D"],["642","Shrine","J/SH – R – N"],["643","Charm","J/SH – R – M"],["644","Churchgoer","J/SH – R – R"],["645","Shuffle","J/SH – R – L"],["646","Shrug","J/SH – R – J/SH"],["647","Shark","J/SH – R – K/G"],["648","Shoehorn","J/SH – R – F/V"],["649","Shrimp","J/SH – R – P/B"],["650","Chalks","J/SH – L – S/Z"],["651","Shelter","J/SH – L – T/D"],["652","Jellyfish","J/SH – L – N"],["653","Shelve","J/SH – L – M"],["654","Sheller","J/SH – L – R"],["655","Chill","J/SH – L – L"],["656","Challeng","J/SH – L – J/SH"],["657","Chalky","J/SH – L – K/G"],["658","Shelf","J/SH – L – F/V"],["659","Jellybean","J/SH – L – P/B"],["660","Jockeys","J/SH – J/SH – S/Z"],["661","Churlish","J/SH – J/SH – T/D"],["662","Channel","J/SH – J/SH – N"],["663","Chum","J/SH – J/SH – M"],["664","Shear","J/SH – J/SH – R"],["665","Jostle","J/SH – J/SH – L"],["666","Judge","J/SH – J/SH – J/SH"],["667","Jock-cage","J/SH – J/SH – K/G"],["668","Judo-vibe","J/SH – J/SH – F/V"],["669","Judo-pub","J/SH – J/SH – P/B"],["670","Jocks","J/SH – K/G – S/Z"],["671","Jacket","J/SH – K/G – T/D"],["672","Beacon","J/SH – K/G – N"],["673","Wager","J/SH – K/G – M"],["674","Jackal","J/SH – K/G – R"],["675","Juggle","J/SH – K/G – L"],["676","Jackhammer","J/SH – K/G – J/SH"],["677","Jig-cake","J/SH – K/G – K/G"],["678","Jig-vibe","J/SH – K/G – F/V"],["679","Jackpot","J/SH – K/G – P/B"],["680","Chives","J/SH – F/V – S/Z"],["681","Churned","J/SH – F/V – T/D"],["682","Chivvying","J/SH – F/V – N"],["683","Shove-mob","J/SH – F/V – M"],["684","Shiver","J/SH – F/V – R"],["685","Shovel","J/SH – F/V – L"],["686","Savvily","J/SH – F/V – J/SH"],["687","Civic","J/SH – F/V – K/G"],["688","Chive-vibe","J/SH – F/V – F/V"],["689","Shiv-pub","J/SH – F/V – P/B"],["690","Chimps","J/SH – P/B – S/Z"],["691","Chapel","J/SH – P/B – T/D"],["692","Gibson","J/SH – P/B – N"],["693","Jamboree","J/SH – P/B – M"],["694","Chopper","J/SH – P/B – R"],["695","Chapel","J/SH – P/B – L"],["696","Cobble","J/SH – P/B – J/SH"],["697","Chapbook","J/SH – P/B – K/G"],["698","Ship-vibe","J/SH – P/B – F/V"],["699","Chipmunk","J/SH – P/B – P/B"],["700","Goose","K/G – S/Z – S/Z"],["701","Gusto","K/G – S/Z – T/D"],["702","Gain","K/G – S/Z – N"],["703","Game","K/G – S/Z – M"],["704","Gore","K/G – S/Z – R"],["705","Gale","K/G – S/Z – L"],["706","Gauge","K/G – S/Z – J/SH"],["707","Cockerel","K/G – S/Z – K/G"],["708","Cave","K/G – S/Z – F/V"],["709","Cab","K/G – S/Z – P/B"],["710","Gust","K/G – T/D – S/Z"],["711","Cadet","K/G – T/D – T/D"],["712","Kitten","K/G – T/D – N"],["713","Godmother","K/G – T/D – M"],["714","Cater","K/G – T/D – R"],["715","Kettle","K/G – T/D – L"],["716","Catch","K/G – T/D – J/SH"],["717","Kickback","K/G – T/D – K/G"],["718","Captive","K/G – T/D – F/V"],["719","Catfish","K/G – T/D – P/B"],["720","Coins","K/G – N – S/Z"],["721","Canteen","K/G – N – T/D"],["722","Cannon","K/G – N – N"],["723","Gunmen","K/G – N – M"],["724","Gunner","K/G – N – R"],["725","Canal","K/G – N – L"],["726","Canary","K/G – N – J/SH"],["727","Gunshot","K/G – N – K/G"],["728","Confide","K/G – N – F/V"],["729","Canopy","K/G – N – P/B"],["730","Cams","K/G – M – S/Z"],["731","Comet","K/G – M – T/D"],["732","Common","K/G – M – N"],["733","Gambler","K/G – M – M"],["734","Camera","K/G – M – R"],["735","Camel","K/G – M – L"],["736","Comcast","K/G – M – J/SH"],["737","Comic","K/G – M – K/G"],["738","Comfort","K/G – M – F/V"],["739","Camp","K/G – M – P/B"],["740","Cars","K/G – R – S/Z"],["741","Cart","K/G – R – T/D"],["742","Crayon","K/G – R – N"],["743","Cream","K/G – R – M"],["744","Courier","K/G – R – R"],["745","Carol","K/G – R – L"],["746","Crash","K/G – R – J/SH"],["747","Crack","K/G – R – K/G"],["748","Carafe","K/G – R – F/V"],["749","Crab","K/G – R – P/B"],["750","Glass","K/G – L – S/Z"],["751","Cold","K/G – L – T/D"],["752","Golden","K/G – L – N"],["753","Gleam","K/G – L – M"],["754","Collar","K/G – L – R"],["755","Coil","K/G – L – L"],["756","Clench","K/G – L – J/SH"],["757","Clock","K/G – L – K/G"],["758","Cliff","K/G – L – F/V"],["759","Clap","K/G – L – P/B"],["760","Cashes","K/G – J/SH – S/Z"],["761","Coast","K/G – J/SH – T/D"],["762","Kitchen","K/G – J/SH – N"],["763","Custard","K/G – J/SH – M"],["764","Casher","K/G – J/SH – R"],["765","Geyser","K/G – J/SH – L"],["766","Cackle","K/G – J/SH – J/SH"],["767","Cookie","K/G – J/SH – K/G"],["768","Cushion","K/G – J/SH – F/V"],["769","Cashback","K/G – J/SH – P/B"],["770","Cooks","K/G – K/G – S/Z"],["771","Cocked","K/G – K/G – T/D"],["772","Chicken","K/G – K/G – N"],["773","Cuckoo","K/G – K/G – M"],["774","Cracker","K/G – K/G – R"],["775","Cackle","K/G – K/G – L"],["776","Cuckold","K/G – K/G – J/SH"],["777","Cacao","K/G – K/G – K/G"],["778","Captive","K/G – K/G – F/V"],["779","Pickup","K/G – K/G – P/B"],["780","Coffee","K/G – F/V – S/Z"],["781","Cuffed","K/G – F/V – T/D"],["782","Cabin","K/G – F/V – N"],["783","Caveman","K/G – F/V – M"],["784","Cover","K/G – F/V – R"],["785","Careful","K/G – F/V – L"],["786","Caveat","K/G – F/V – J/SH"],["787","Cowgirl","K/G – F/V – K/G"],["788","Cave-vibe","K/G – F/V – F/V"],["789","Cobweb","K/G – F/V – P/B"],["790","Cups","K/G – P/B – S/Z"],["791","Gobbled","K/G – P/B – T/D"],["792","Cabin-inn","K/G – P/B – N"],["793","Gobsmack","K/G – P/B – M"],["794","Copper","K/G – P/B – R"],["795","Capable","K/G – P/B – L"],["796","Cobblestone","K/G – P/B – J/SH"],["797","Cubic","K/G – P/B – K/G"],["798","Cupboard","K/G – P/B – F/V"],["799","Goblin","K/G – P/B – P/B"],["800","Faces","F/V – S/Z – S/Z"],["801","Fist","F/V – S/Z – T/D"],["802","Finn","F/V – S/Z – N"],["803","Foam","F/V – S/Z – M"],["804","Fur","F/V – S/Z – R"],["805","File","F/V – S/Z – L"],["806","Fish","F/V – S/Z – J/SH"],["807","Fig","F/V – S/Z – K/G"],["808","Fife","F/V – S/Z – F/V"],["809","Fib","F/V – S/Z – P/B"],["810","Fads","F/V – T/D – S/Z"],["811","Fatted","F/V – T/D – T/D"],["812","Fatten","F/V – T/D – N"],["813","Phantom","F/V – T/D – M"],["814","Fitter","F/V – T/D – R"],["815","Fiddle","F/V – T/D – L"],["816","Fetch","F/V – T/D – J/SH"],["817","Fabric","F/V – T/D – K/G"],["818","Fatigue","F/V – T/D – F/V"],["819","Fudge-pub","F/V – T/D – P/B"],["820","Fens","F/V – N – S/Z"],["821","Fiend","F/V – N – T/D"],["822","Pony","F/V – N – N"],["823","Famine","F/V – N – M"],["824","Fenner","F/V – N – R"],["825","Funnel","F/V – N – L"],["826","Finch","F/V – N – J/SH"],["827","Funk","F/V – N – K/G"],["828","Phonic","F/V – N – F/V"],["829","Bingo","F/V – N – P/B"],["830","Fumes","F/V – M – S/Z"],["831","Format","F/V – M – T/D"],["832","Fireman","F/V – M – N"],["833","Farm-mom","F/V – M – M"],["834","Farmer","F/V – M – R"],["835","Fumble","F/V – M – L"],["836","Pheasant","F/V – M – J/SH"],["837","Fomite","F/V – M – K/G"],["838","Fame-vibe","F/V – M – F/V"],["839","Bump","F/V – M – P/B"],["840","Furrows","F/V – R – S/Z"],["841","Fort","F/V – R – T/D"],["842","Fern","F/V – R – N"],["843","Forum","F/V – R – M"],["844","Firebrand","F/V – R – R"],["845","Furl","F/V – R – L"],["846","Furnish","F/V – R – J/SH"],["847","Brick","F/V – R – K/G"],["848","Faraway","F/V – R – F/V"],["849","Fibre","F/V – R – P/B"],["850","Falls","F/V – L – S/Z"],["851","Felt","F/V – L – T/D"],["852","Fallen","F/V – L – N"],["853","Film","F/V – L – M"],["854","Felon","F/V – L – R"],["855","Villa","F/V – L – L"],["856","Flesh","F/V – L – J/SH"],["857","Flock","F/V – L – K/G"],["858","Fleet","F/V – L – F/V"],["859","Flap","F/V – L – P/B"],["860","Fetish","F/V – J/SH – S/Z"],["861","Fudged","F/V – J/SH – T/D"],["862","Vision","F/V – J/SH – N"],["863","Fathom","F/V – J/SH – M"],["864","Fisher","F/V – J/SH – R"],["865","Fishmonger","F/V – J/SH – L"],["866","Fashion","F/V – J/SH – J/SH"],["867","Physique","F/V – J/SH – K/G"],["868","Fish-vibe","F/V – J/SH – F/V"],["869","Fish-pub","F/V – J/SH – P/B"],["870","Figs","F/V – K/G – S/Z"],["871","Focused","F/V – K/G – T/D"],["872","Bacon","F/V – K/G – N"],["873","Vacuum","F/V – K/G – M"],["874","Wicker","F/V – K/G – R"],["875","Wicked","F/V – K/G – L"],["876","Vacuum-wage","F/V – K/G – J/SH"],["877","Foggy","F/V – K/G – K/G"],["878","Fought","F/V – K/G – F/V"],["879","Vibrant","F/V – K/G – P/B"],["880","Fife","F/V – F/V – S/Z"],["881","Vivid","F/V – F/V – T/D"],["882","Felon","F/V – F/V – N"],["883","Vomit","F/V – F/V – M"],["884","Fever","F/V – F/V – R"],["885","Novel","F/V – F/V – L"],["886","Vivify","F/V – F/V – J/SH"],["887","Maverick","F/V – F/V – K/G"],["888","Vivid-vibe","F/V – F/V – F/V"],["889","Vapor","F/V – F/V – P/B"],["890","Vibes","F/V – P/B – S/Z"],["891","Abbot","F/V – P/B – T/D"],["892","Above","F/V – P/B – N"],["893","Vim","F/V – P/B – M"],["894","Vibrate","F/V – P/B – R"],["895","Fable","F/V – P/B – L"],["896","Phobia","F/V – P/B – J/SH"],["897","Fabric","F/V – P/B – K/G"],["898","Febrile","F/V – P/B – F/V"],["899","Vapor","F/V – P/B – P/B"],["900","Passes","P/B – S/Z – S/Z"],["901","Passed","P/B – S/Z – T/D"],["902","Pine","P/B – S/Z – N"],["903","Poem","P/B – S/Z – M"],["904","Pore","P/B – S/Z – R"],["905","Pile","P/B – S/Z – L"],["906","Peach","P/B – S/Z – J/SH"],["907","Pick","P/B – S/Z – K/G"],["908","Pave","P/B – S/Z – F/V"],["909","Pip","P/B – S/Z – P/B"],["910","Beads","P/B – T/D – S/Z"],["911","Potted","P/B – T/D – T/D"],["912","Button","P/B – T/D – N"],["913","Bottom","P/B – T/D – M"],["914","Butter","P/B – T/D – R"],["915","Bottle","P/B – T/D – L"],["916","Patch","P/B – T/D – J/SH"],["917","Bodkin","P/B – T/D – K/G"],["918","Badge","P/B – T/D – F/V"],["919","Bedpan","P/B – T/D – P/B"],["920","Bones","P/B – N – S/Z"],["921","Pint","P/B – N – T/D"],["922","Pennon","P/B – N – N"],["923","Bandit","P/B – N – M"],["924","Punner","P/B – N – R"],["925","Panel","P/B – N – L"],["926","Punch","P/B – N – J/SH"],["927","Panic","P/B – N – K/G"],["928","Banjo","P/B – N – F/V"],["929","Bouncy","P/B – N – P/B"],["930","Pommes","P/B – M – S/Z"],["931","Permit","P/B – M – T/D"],["932","Bamboo","P/B – M – N"],["933","Pom-mob","P/B – M – M"],["934","Pomade","P/B – M – R"],["935","Pimple","P/B – M – L"],["936","Bombard","P/B – M – J/SH"],["937","Pompastic","P/B – M – K/G"],["938","Pompon","P/B – M – F/V"],["939","Bumble","P/B – M – P/B"],["940","Prize","P/B – R – S/Z"],["941","Proud","P/B – R – T/D"],["942","Brain","P/B – R – N"],["943","Brim","P/B – R – M"],["944","Arbor","P/B – R – R"],["945","Brail","P/B – R – L"],["946","Breach","P/B – R – J/SH"],["947","Brick","P/B – R – K/G"],["948","Brave","P/B – R – F/V"],["949","Probe","P/B – R – P/B"],["950","Balls","P/B – L – S/Z"],["951","Bolt","P/B – L – T/D"],["952","Balloon","P/B – L – N"],["953","Palm","P/B – L – M"],["954","Baler","P/B – L – R"],["955","Ballpark","P/B – L – L"],["956","Bleach","P/B – L – J/SH"],["957","Black","P/B – L – K/G"],["958","Blame","P/B – L – F/V"],["959","Blob","P/B – L – P/B"],["960","Peaches","P/B – J/SH – S/Z"],["961","Putrid","P/B – J/SH – T/D"],["962","Bison","P/B – J/SH – N"],["963","Pilgrim","P/B – J/SH – M"],["964","Butcher","P/B – J/SH – R"],["965","Bushel","P/B – J/SH – L"],["966","Bushido","P/B – J/SH – J/SH"],["967","Pillage","P/B – J/SH – K/G"],["968","Passage","P/B – J/SH – F/V"],["969","Bishop","P/B – J/SH – P/B"],["970","Backs","P/B – K/G – S/Z"],["971","Bucket","P/B – K/G – T/D"],["972","Beacon","P/B – K/G – N"],["973","Begum","P/B – K/G – M"],["974","Bookcase","P/B – K/G – R"],["975","Buckle","P/B – K/G – L"],["976","Bikini","P/B – K/G – J/SH"],["977","Backup","P/B – K/G – K/G"],["978","Beehive","P/B – K/G – F/V"],["979","Beehive-pub","P/B – K/G – P/B"],["980","Pubs","P/B – F/V – S/Z"],["981","Buffet","P/B – F/V – T/D"],["982","Puffin","P/B – F/V – N"],["983","Brave-mob","P/B – F/V – M"],["984","Beaver","P/B – F/V – R"],["985","Befriend","P/B – F/V – L"],["986","Bravado","P/B – F/V – J/SH"],["987","Puffy","P/B – F/V – K/G"],["988","Vibrate-vibe","P/B – F/V – F/V"],["989","Paper","P/B – F/V – P/B"],["990","Pops","P/B – P/B – S/Z"],["991","Puppet","P/B – P/B – T/D"],["992","Baboon","P/B – P/B – N"],["993","Bamboom","P/B – P/B – M"],["994","Pepper","P/B – P/B – R"],["995","Papal","P/B – P/B – L"],["996","Pipsqueak","P/B – P/B – J/SH"],["997","Pubback","P/B – P/B – K/G"],["998","Beehive","P/B – P/B – F/V"],["999","Puppy","P/B – P/B – P/B"],["1000","Toads-nest","T/D – S/Z – S/Z – S/Z"]
+];
+
+const PAO_CARDS = [
+["2C","Nick Cave","CaNter","CaNe"],["3C","Mariah Carey","CaMP","CuM"],["4C","Ruben Carter","CaRve","CoRe"],["5C","Lara Croft","CrawL","CooL"],["6C","Siôn Corn","CruSH","CaSH"],["7C","Chris Cornell","CaCkle","CoCo pops"],["8C","Fidel Castro","CaVort","CaVe"],["9C","Prince Charles","CaPture","CaPe"],["10C","Oswald Cobblepot","CaSt","CooS"],["JC","Jesus Christ","CaJole","CaGe"],["QC","Queen Cleopatra","ConQuer","KumQuat"],["KC","Krusty the Clown","CocK","CaKe"],["AC","Al Capone","ACt","CluB"],
+["2D","Nostradamus","DaNce","DoNner kebab"],["3D","Michael Douglas","DuMP","DiMe"],["4D","Roger Daltrey","DaRt","DeeR"],["5D","Leonardo DiCaprio","DriLL","DeaL"],["6D","Sharon Davies","DaSH","DaSH"],["7D","Cameron Diaz","DoCk","DeCor"],["8D","Victor von Doom","DraFt","DiVe"],["9D","P Diddy","DiP","DoPe"],["10D","Orville the Duck","DaZe","De Doo Doo Doo"],["JD","James Dean","DeJect","DodGe"],["QD","Quasimodo","DunK","QuaD bike"],["KD","Ken Dodd","DucK","DicK"],["AD","Ant and Dec","AiD","Diamond"],
+["2H","Noddy Holder","HoNk","HeN"],["3H","Michael Hutchence","HaMMer","HuM"],["4H","Rolf Harris","HuRl","WHoRe"],["5H","Lewis Hamilton","HowL","HaiL"],["6H","Shane Horgan","HuSH","HaSH"],["7H","Chris Hoy","HaCk","HiCCup"],["8H","François Hollande","HoVer","HooF"],["9H","Prince Harry","HoPe","HoP"],["10H","Owen Hart","HiSS","HoHoHo"],["JH","Jabba the Hutt","HiJack","HiJab"],["QH","Queen of Hearts","HusK","Queen of Hearts"],["KH","King Henry VIII","HacK","HiKe"],["AH","Adolf Hitler","AcHe","Heart"],
+["2S","Neville Southall","SaNd","SuN"],["3S","Mr Strong","SlaM","SuMo"],["4S","Rod Stewart","SoaR","SoRes"],["5S","Lisa Simpson","SaiL","Silo bin"],["6S","Sharon Stone","SlaSH","SaSH"],["7S","Captain Sparrow","SaCk","SiCk"],["8S","Frank Sinatra","ShaVe","SaFe"],["9S","Pete Sampras","SlaP","SiP"],["10S","Oscar Schindler","SiZe","Soo"],["JS","Jimmy Savile","SurGe","SaGe"],["QS","Steve McQueen","SQueeze","SeQuin"],["KS","Kevin Spacey","StaKe","SaKi"],["AS","Agent Smith","ASk","Spade"]
+];
+
+const PALACE = [
+"Parcel box","Shoe cupboard","Hanging from light","Far love seat with Dyfri","Lying on main sofa","Poking the fire","Near love seat with Tipsi","In junk under the stairs","Playing with lights on dinner table","Playing darts","On the toilet","Sliding down bannister","Slam Enfys door","Ivy bed","Curling hair in our room","Lava lamp in Noah's room","Boiling with boiler","Shower","Frying","Playing piano","Playing computer","Playing double bass","Washing and drying","Gym yoga / weights","Bumming Josh","In the barrel","In the shed","Doing the bins","Mowing the lawn","Plugging in car","Zombie by church","Up with the rooks","Jumping in big puddle","Pissed outside The Fox with Henson","Stuck in cattle grill","Riding a sheep","Quarry in high vis","Drug house","Wooden sign","Bike on bridge","Stroking peacock","Riding horse","Parking meter","Food festival","Sauna","Drench bucket","Camera trap","Dog walking","Sand dune sledge","Running into sea","Kite surfing","Flying into the sun"
+];
+
+/* ---- wiring for the My Systems tab ---- */
+const sysWhich = document.getElementById('sys-which');
+const sysMajorControls = document.getElementById('sys-major-controls');
+const sysPaoControls = document.getElementById('sys-pao-controls');
+const sysPalaceControls = document.getElementById('sys-palace-controls');
+const sysMajorLen = document.getElementById('sys-major-len');
+const sysFullList = document.getElementById('sys-full-list');
+
+function majorTableFor(len){
+  if(len==='single') return MAJOR_SINGLE;
+  if(len==='triple') return MAJOR_TRIPLE;
+  return MAJOR_DOUBLE;
+}
+
+function updateSysControlsVisibility(){
+  sysMajorControls.classList.toggle('hidden', sysWhich.value!=='major');
+  sysPaoControls.classList.toggle('hidden', sysWhich.value!=='pao');
+  sysPalaceControls.classList.toggle('hidden', sysWhich.value!=='palace');
+  sysFullList.classList.add('hidden');
+}
+
+// Major system lookup
+document.getElementById('sys-major-lookup').addEventListener('input', function(){
+  const q = this.value.trim();
+  const resultEl = document.getElementById('sys-major-lookup-result');
+  if(!q){ resultEl.innerHTML = '&nbsp;'; return; }
+  const table = majorTableFor(sysMajorLen.value);
+  const hit = table.find(r=>r[0]===q.padStart(table===MAJOR_DOUBLE?2:(table===MAJOR_TRIPLE?3:1),'0')) || table.find(r=>r[0]===q);
+  if(hit){
+    resultEl.innerHTML = '<b>'+hit[0]+'</b>: '+hit[1]+' <span style="color:var(--muted);">('+hit[2]+')</span>';
+  } else {
+    resultEl.innerHTML = 'No match in this table';
+  }
+});
+sysMajorLen.addEventListener('change', ()=>{
+  document.getElementById('sys-major-lookup').dispatchEvent(new Event('input'));
+  sysFlash.reload();
+});
+
+// PAO lookup
+document.getElementById('sys-pao-lookup').addEventListener('input', function(){
+  const q = this.value.trim().toUpperCase();
+  const resultEl = document.getElementById('sys-pao-lookup-result');
+  if(!q){ resultEl.innerHTML = '&nbsp;'; return; }
+  const hit = PAO_CARDS.find(r=>r[0]===q);
+  if(hit){
+    resultEl.innerHTML = '<b>'+hit[0]+'</b>: '+hit[1]+' &middot; '+hit[2]+' &middot; '+hit[3];
+  } else {
+    resultEl.innerHTML = 'No match (try e.g. QH, 10C, AS)';
+  }
+});
+
+// Palace: show full route
+document.getElementById('sys-palace-showall').addEventListener('click', ()=>{
+  sysFullList.classList.toggle('hidden');
+  if(!sysFullList.classList.contains('hidden')){
+    sysFullList.innerHTML = PALACE.map((loc,i)=>'<div>'+(i+1)+'. '+loc+'</div>').join('');
+  }
+});
+
+sysWhich.addEventListener('change', ()=>{
+  updateSysControlsVisibility();
+  sysFlash.reload();
+});
+document.getElementById('sys-palace-dir').addEventListener('change', ()=> sysFlash.reload());
+updateSysControlsVisibility();
+
+const sysFlash = makeFlashcards({
+  prefix: 'sys',
+  dataProvider: function(){
+    const which = sysWhich.value;
+    if(which==='major'){
+      return majorTableFor(sysMajorLen.value).map(([num,word,phon])=>({
+        front: num,
+        back: word + ' <span style="color:var(--muted);">(' + phon + ')</span>'
+      }));
+    } else if(which==='pao'){
+      return PAO_CARDS.map(([card,person,action,object])=>({
+        front: card,
+        back: person + ' &middot; ' + action + ' &middot; ' + object
+      }));
+    } else {
+      const dir = document.getElementById('sys-palace-dir').value;
+      return PALACE.map((loc,i)=>{
+        let d = dir;
+        if(d==='both') d = Math.random()<0.5 ? 'loc' : 'num';
+        if(d==='num') return {front: loc, back: String(i+1)};
+        return {front: String(i+1), back: loc};
+      });
+    }
+  },
+  flashEl: document.getElementById('sys-flash'),
+  revealBtn: document.getElementById('sys-reveal'),
+  gotBtn: document.getElementById('sys-got'),
+  missedBtn: document.getElementById('sys-missed'),
+  scoreEl: document.getElementById('sys-score-n'),
+  bestEl: document.getElementById('sys-best'),
+  shuffleBtn: document.getElementById('sys-shuffle'),
+});
+
+/* ============================================================
+   OSCARS & MERCURY PRIZE — DATA
+   ============================================================ */
+const OSCAR_PICTURE = [
+["1927/28","Wings"],["1928/29","The Broadway Melody"],["1929/30","All Quiet on the Western Front"],["1930/31","Cimarron"],["1931/32","Grand Hotel"],["1932/33","Cavalcade"],["1934","It Happened One Night"],["1935","Mutiny on the Bounty"],["1936","The Great Ziegfeld"],["1937","The Life of Emile Zola"],["1938","You Can't Take It with You"],["1939","Gone with the Wind"],["1940","Rebecca"],["1941","How Green Was My Valley"],["1942","Mrs. Miniver"],["1943","Casablanca"],["1944","Going My Way"],["1945","The Lost Weekend"],["1946","The Best Years of Our Lives"],["1947","Gentleman's Agreement"],["1948","Hamlet"],["1949","All the King's Men"],["1950","All About Eve"],["1951","An American in Paris"],["1952","The Greatest Show on Earth"],["1953","From Here to Eternity"],["1954","On the Waterfront"],["1955","Marty"],["1956","Around the World in 80 Days"],["1957","The Bridge on the River Kwai"],["1958","Gigi"],["1959","Ben-Hur"],["1960","The Apartment"],["1961","West Side Story"],["1962","Lawrence of Arabia"],["1963","Tom Jones"],["1964","My Fair Lady"],["1965","The Sound of Music"],["1966","A Man for All Seasons"],["1967","In the Heat of the Night"],["1968","Oliver!"],["1969","Midnight Cowboy"],["1970","Patton"],["1971","The French Connection"],["1972","The Godfather"],["1973","The Sting"],["1974","The Godfather Part II"],["1975","One Flew Over the Cuckoo's Nest"],["1976","Rocky"],["1977","Annie Hall"],["1978","The Deer Hunter"],["1979","Kramer vs. Kramer"],["1980","Ordinary People"],["1981","Chariots of Fire"],["1982","Gandhi"],["1983","Terms of Endearment"],["1984","Amadeus"],["1985","Out of Africa"],["1986","Platoon"],["1987","The Last Emperor"],["1988","Rain Man"],["1989","Driving Miss Daisy"],["1990","Dances with Wolves"],["1991","The Silence of the Lambs"],["1992","Unforgiven"],["1993","Schindler's List"],["1994","Forrest Gump"],["1995","Braveheart"],["1996","The English Patient"],["1997","Titanic"],["1998","Shakespeare in Love"],["1999","American Beauty"],["2000","Gladiator"],["2001","A Beautiful Mind"],["2002","Chicago"],["2003","The Lord of the Rings: The Return of the King"],["2004","Million Dollar Baby"],["2005","Crash"],["2006","The Departed"],["2007","No Country for Old Men"],["2008","Slumdog Millionaire"],["2009","The Hurt Locker"],["2010","The King's Speech"],["2011","The Artist"],["2012","Argo"],["2013","12 Years a Slave"],["2014","Birdman"],["2015","Spotlight"],["2016","Moonlight"],["2017","The Shape of Water"],["2018","Green Book"],["2019","Parasite"],["2020","Nomadland"],["2021","CODA"],["2022","Everything Everywhere All at Once"],["2023","Oppenheimer"],["2024","Anora"],["2025","One Battle After Another"]
+];
+
+const OSCAR_ACTOR = [
+["1927/28","Emil Jannings","The Last Command / The Way of All Flesh"],["1928/29","Warner Baxter","In Old Arizona"],["1929/30","George Arliss","Disraeli"],["1930/31","Lionel Barrymore","A Free Soul"],["1931/32","Wallace Beery","The Champ"],["1932/33","Charles Laughton","The Private Life of Henry VIII"],["1934","Clark Gable","It Happened One Night"],["1935","Victor McLaglen","The Informer"],["1936","Paul Muni","The Story of Louis Pasteur"],["1937","Spencer Tracy","Captains Courageous"],["1938","Spencer Tracy","Boys Town"],["1939","Robert Donat","Goodbye, Mr. Chips"],["1940","James Stewart","The Philadelphia Story"],["1941","Gary Cooper","Sergeant York"],["1942","James Cagney","Yankee Doodle Dandy"],["1943","Paul Lukas","Watch on the Rhine"],["1944","Bing Crosby","Going My Way"],["1945","Ray Milland","The Lost Weekend"],["1946","Fredric March","The Best Years of Our Lives"],["1947","Ronald Colman","A Double Life"],["1948","Laurence Olivier","Hamlet"],["1949","Broderick Crawford","All the King's Men"],["1950","José Ferrer","Cyrano de Bergerac"],["1951","Humphrey Bogart","The African Queen"],["1952","Gary Cooper","High Noon"],["1953","William Holden","Stalag 17"],["1954","Marlon Brando","On the Waterfront"],["1955","Ernest Borgnine","Marty"],["1956","Yul Brynner","The King and I"],["1957","Alec Guinness","The Bridge on the River Kwai"],["1958","David Niven","Separate Tables"],["1959","Charlton Heston","Ben-Hur"],["1960","Burt Lancaster","Elmer Gantry"],["1961","Maximilian Schell","Judgment at Nuremberg"],["1962","Gregory Peck","To Kill a Mockingbird"],["1963","Sidney Poitier","Lilies of the Field"],["1964","Rex Harrison","My Fair Lady"],["1965","Lee Marvin","Cat Ballou"],["1966","Paul Scofield","A Man for All Seasons"],["1967","Rod Steiger","In the Heat of the Night"],["1968","Cliff Robertson","Charly"],["1969","John Wayne","True Grit"],["1970","George C. Scott","Patton (declined award)"],["1971","Gene Hackman","The French Connection"],["1972","Marlon Brando","The Godfather (declined award)"],["1973","Jack Lemmon","Save the Tiger"],["1974","Art Carney","Harry and Tonto"],["1975","Jack Nicholson","One Flew Over the Cuckoo's Nest"],["1976","Peter Finch","Network (posthumous)"],["1977","Richard Dreyfuss","The Goodbye Girl"],["1978","Jon Voight","Coming Home"],["1979","Dustin Hoffman","Kramer vs. Kramer"],["1980","Robert De Niro","Raging Bull"],["1981","Henry Fonda","On Golden Pond"],["1982","Ben Kingsley","Gandhi"],["1983","Robert Duvall","Tender Mercies"],["1984","F. Murray Abraham","Amadeus"],["1985","William Hurt","Kiss of the Spider Woman"],["1986","Paul Newman","The Color of Money"],["1987","Michael Douglas","Wall Street"],["1988","Dustin Hoffman","Rain Man"],["1989","Daniel Day-Lewis","My Left Foot"],["1990","Jeremy Irons","Reversal of Fortune"],["1991","Anthony Hopkins","The Silence of the Lambs"],["1992","Al Pacino","Scent of a Woman"],["1993","Tom Hanks","Philadelphia"],["1994","Tom Hanks","Forrest Gump"],["1995","Nicolas Cage","Leaving Las Vegas"],["1996","Geoffrey Rush","Shine"],["1997","Jack Nicholson","As Good as It Gets"],["1998","Roberto Benigni","Life Is Beautiful"],["1999","Kevin Spacey","American Beauty"],["2000","Russell Crowe","Gladiator"],["2001","Denzel Washington","Training Day"],["2002","Adrien Brody","The Pianist"],["2003","Sean Penn","Mystic River"],["2004","Jamie Foxx","Ray"],["2005","Philip Seymour Hoffman","Capote"],["2006","Forest Whitaker","The Last King of Scotland"],["2007","Daniel Day-Lewis","There Will Be Blood"],["2008","Sean Penn","Milk"],["2009","Jeff Bridges","Crazy Heart"],["2010","Colin Firth","The King's Speech"],["2011","Jean Dujardin","The Artist"],["2012","Daniel Day-Lewis","Lincoln"],["2013","Matthew McConaughey","Dallas Buyers Club"],["2014","Eddie Redmayne","The Theory of Everything"],["2015","Leonardo DiCaprio","The Revenant"],["2016","Casey Affleck","Manchester by the Sea"],["2017","Gary Oldman","Darkest Hour"],["2018","Rami Malek","Bohemian Rhapsody"],["2019","Joaquin Phoenix","Joker"],["2020","Anthony Hopkins","The Father"],["2021","Will Smith","King Richard"],["2022","Brendan Fraser","The Whale"],["2023","Cillian Murphy","Oppenheimer"],["2024","Adrien Brody","The Brutalist"],["2025","Michael B. Jordan","Sinners"]
+];
+
+const OSCAR_ACTRESS = [
+["1927/28","Janet Gaynor","7th Heaven / Street Angel / Sunrise"],["1928/29","Mary Pickford","Coquette"],["1929/30","Norma Shearer","The Divorcee"],["1930/31","Marie Dressler","Min and Bill"],["1931/32","Helen Hayes","The Sin of Madelon Claudet"],["1932/33","Katharine Hepburn","Morning Glory"],["1934","Claudette Colbert","It Happened One Night"],["1935","Bette Davis","Dangerous"],["1936","Luise Rainer","The Great Ziegfeld"],["1937","Luise Rainer","The Good Earth"],["1938","Bette Davis","Jezebel"],["1939","Vivien Leigh","Gone with the Wind"],["1940","Ginger Rogers","Kitty Foyle"],["1941","Joan Fontaine","Suspicion"],["1942","Greer Garson","Mrs. Miniver"],["1943","Jennifer Jones","The Song of Bernadette"],["1944","Ingrid Bergman","Gaslight"],["1945","Joan Crawford","Mildred Pierce"],["1946","Olivia de Havilland","To Each His Own"],["1947","Loretta Young","The Farmer's Daughter"],["1948","Jane Wyman","Johnny Belinda"],["1949","Olivia de Havilland","The Heiress"],["1950","Judy Holliday","Born Yesterday"],["1951","Vivien Leigh","A Streetcar Named Desire"],["1952","Shirley Booth","Come Back, Little Sheba"],["1953","Audrey Hepburn","Roman Holiday"],["1954","Grace Kelly","The Country Girl"],["1955","Anna Magnani","The Rose Tattoo"],["1956","Ingrid Bergman","Anastasia"],["1957","Joanne Woodward","The Three Faces of Eve"],["1958","Susan Hayward","I Want to Live!"],["1959","Simone Signoret","Room at the Top"],["1960","Elizabeth Taylor","Butterfield 8"],["1961","Sophia Loren","Two Women"],["1962","Anne Bancroft","The Miracle Worker"],["1963","Patricia Neal","Hud"],["1964","Julie Andrews","Mary Poppins"],["1965","Julie Christie","Darling"],["1966","Elizabeth Taylor","Who's Afraid of Virginia Woolf?"],["1967","Katharine Hepburn","Guess Who's Coming to Dinner"],["1968","Katharine Hepburn","The Lion in Winter (tied with Barbra Streisand, Funny Girl)"],["1969","Maggie Smith","The Prime of Miss Jean Brodie"],["1970","Glenda Jackson","Women in Love"],["1971","Jane Fonda","Klute"],["1972","Liza Minnelli","Cabaret"],["1973","Glenda Jackson","A Touch of Class"],["1974","Ellen Burstyn","Alice Doesn't Live Here Anymore"],["1975","Louise Fletcher","One Flew Over the Cuckoo's Nest"],["1976","Faye Dunaway","Network"],["1977","Diane Keaton","Annie Hall"],["1978","Jane Fonda","Coming Home"],["1979","Sally Field","Norma Rae"],["1980","Sissy Spacek","Coal Miner's Daughter"],["1981","Katharine Hepburn","On Golden Pond"],["1982","Meryl Streep","Sophie's Choice"],["1983","Shirley MacLaine","Terms of Endearment"],["1984","Sally Field","Places in the Heart"],["1985","Geraldine Page","The Trip to Bountiful"],["1986","Marlee Matlin","Children of a Lesser God"],["1987","Cher","Moonstruck"],["1988","Jodie Foster","The Accused"],["1989","Jessica Tandy","Driving Miss Daisy"],["1990","Kathy Bates","Misery"],["1991","Jodie Foster","The Silence of the Lambs"],["1992","Emma Thompson","Howards End"],["1993","Holly Hunter","The Piano"],["1994","Jessica Lange","Blue Sky"],["1995","Susan Sarandon","Dead Man Walking"],["1996","Frances McDormand","Fargo"],["1997","Helen Hunt","As Good as It Gets"],["1998","Gwyneth Paltrow","Shakespeare in Love"],["1999","Hilary Swank","Boys Don't Cry"],["2000","Julia Roberts","Erin Brockovich"],["2001","Halle Berry","Monster's Ball"],["2002","Nicole Kidman","The Hours"],["2003","Charlize Theron","Monster"],["2004","Hilary Swank","Million Dollar Baby"],["2005","Reese Witherspoon","Walk the Line"],["2006","Helen Mirren","The Queen"],["2007","Marion Cotillard","La Vie en Rose"],["2008","Kate Winslet","The Reader"],["2009","Sandra Bullock","The Blind Side"],["2010","Natalie Portman","Black Swan"],["2011","Meryl Streep","The Iron Lady"],["2012","Jennifer Lawrence","Silver Linings Playbook"],["2013","Cate Blanchett","Blue Jasmine"],["2014","Julianne Moore","Still Alice"],["2015","Brie Larson","Room"],["2016","Emma Stone","La La Land"],["2017","Frances McDormand","Three Billboards Outside Ebbing, Missouri"],["2018","Olivia Colman","The Favourite"],["2019","Renée Zellweger","Judy"],["2020","Frances McDormand","Nomadland"],["2021","Jessica Chastain","The Eyes of Tammy Faye"],["2022","Michelle Yeoh","Everything Everywhere All at Once"],["2023","Emma Stone","Poor Things"],["2024","Mikey Madison","Anora"],["2025","Jessie Buckley","Hamnet"]
+];
+
+const OSCAR_SONG = [
+["1934","\"The Continental\"","The Gay Divorcee"],["1935","\"Lullaby of Broadway\"","Gold Diggers of 1935"],["1936","\"The Way You Look Tonight\"","Swing Time"],["1937","\"Sweet Leilani\"","Waikiki Wedding"],["1938","\"Thanks for the Memory\"","The Big Broadcast of 1938"],["1939","\"Over the Rainbow\"","The Wizard of Oz"],["1940","\"When You Wish Upon a Star\"","Pinocchio"],["1941","\"The Last Time I Saw Paris\"","Lady Be Good"],["1942","\"White Christmas\"","Holiday Inn"],["1943","\"You'll Never Know\"","Hello, Frisco, Hello"],["1944","\"Swinging on a Star\"","Going My Way"],["1945","\"It Might as Well Be Spring\"","State Fair"],["1946","\"On the Atchison, Topeka and the Santa Fe\"","The Harvey Girls"],["1947","\"Zip-a-Dee-Doo-Dah\"","Song of the South"],["1948","\"Buttons and Bows\"","The Paleface"],["1949","\"Baby, It's Cold Outside\"","Neptune's Daughter"],["1950","\"Mona Lisa\"","Captain Carey, U.S.A."],["1951","\"In the Cool, Cool, Cool of the Evening\"","Here Comes the Groom"],["1952","\"The Ballad of High Noon\"","High Noon"],["1953","\"Secret Love\"","Calamity Jane"],["1954","\"Three Coins in the Fountain\"","Three Coins in the Fountain"],["1955","\"Love Is a Many-Splendored Thing\"","Love Is a Many-Splendored Thing"],["1956","\"Que Sera, Sera (Whatever Will Be, Will Be)\"","The Man Who Knew Too Much"],["1957","\"All the Way\"","The Joker Is Wild"],["1958","\"Gigi\"","Gigi"],["1959","\"High Hopes\"","A Hole in the Head"],["1960","\"Never on Sunday\"","Never on Sunday"],["1961","\"Moon River\"","Breakfast at Tiffany's"],["1962","\"Days of Wine and Roses\"","Days of Wine and Roses"],["1963","\"Call Me Irresponsible\"","Papa's Delicate Condition"],["1964","\"Chim Chim Cher-ee\"","Mary Poppins"],["1965","\"The Shadow of Your Smile\"","The Sandpiper"],["1966","\"Born Free\"","Born Free"],["1967","\"Talk to the Animals\"","Doctor Dolittle"],["1968","\"The Windmills of Your Mind\"","The Thomas Crown Affair"],["1969","\"Raindrops Keep Fallin' on My Head\"","Butch Cassidy and the Sundance Kid"],["1970","\"For All We Know\"","Lovers and Other Strangers"],["1971","\"Theme from Shaft\"","Shaft"],["1972","\"The Morning After\"","The Poseidon Adventure"],["1973","\"The Way We Were\"","The Way We Were"],["1974","\"We May Never Love Like This Again\"","The Towering Inferno"],["1975","\"I'm Easy\"","Nashville"],["1976","\"Evergreen\"","A Star Is Born"],["1977","\"You Light Up My Life\"","You Light Up My Life"],["1978","\"Last Dance\"","Thank God It's Friday"],["1979","\"It Goes Like It Goes\"","Norma Rae"],["1980","\"Fame\"","Fame"],["1981","\"Best That You Can Do (Arthur's Theme)\"","Arthur"],["1982","\"Up Where We Belong\"","An Officer and a Gentleman"],["1983","\"Flashdance... What a Feeling\"","Flashdance"],["1984","\"I Just Called to Say I Love You\"","The Woman in Red"],["1985","\"Say You, Say Me\"","White Nights"],["1986","\"Take My Breath Away\"","Top Gun"],["1987","\"(I've Had) The Time of My Life\"","Dirty Dancing"],["1988","\"Let the River Run\"","Working Girl"],["1989","\"Under the Sea\"","The Little Mermaid"],["1990","\"Sooner or Later (I Always Get My Man)\"","Dick Tracy"],["1991","\"Beauty and the Beast\"","Beauty and the Beast"],["1992","\"A Whole New World\"","Aladdin"],["1993","\"Streets of Philadelphia\"","Philadelphia"],["1994","\"Can You Feel the Love Tonight\"","The Lion King"],["1995","\"Colors of the Wind\"","Pocahontas"],["1996","\"You Must Love Me\"","Evita"],["1997","\"My Heart Will Go On\"","Titanic"],["1998","\"When You Believe\"","The Prince of Egypt"],["1999","\"You'll Be in My Heart\"","Tarzan"],["2000","\"Things Have Changed\"","Wonder Boys"],["2001","\"If I Didn't Have You\"","Monsters, Inc."],["2002","\"Lose Yourself\"","8 Mile"],["2003","\"Into the West\"","The Lord of the Rings: The Return of the King"],["2004","\"Al otro lado del río\"","The Motorcycle Diaries"],["2005","\"It's Hard out Here for a Pimp\"","Hustle & Flow"],["2006","\"I Need to Wake Up\"","An Inconvenient Truth"],["2007","\"Falling Slowly\"","Once"],["2008","\"Jai Ho\"","Slumdog Millionaire"],["2009","\"The Weary Kind\"","Crazy Heart"],["2010","\"We Belong Together\"","Toy Story 3"],["2011","\"Man or Muppet\"","The Muppets"],["2012","\"Skyfall\"","Skyfall"],["2013","\"Let It Go\"","Frozen"],["2014","\"Glory\"","Selma"],["2015","\"Writing's on the Wall\"","Spectre"],["2016","\"City of Stars\"","La La Land"],["2017","\"Remember Me\"","Coco"],["2018","\"Shallow\"","A Star Is Born"],["2019","\"(I'm Gonna) Love Me Again\"","Rocketman"],["2020","\"Fight for You\"","Judas and the Black Messiah"],["2021","\"No Time to Die\"","No Time to Die"],["2022","\"Naatu Naatu\"","RRR"],["2023","\"What Was I Made For?\"","Barbie"],["2024","\"El Mal\"","Emilia Pérez"],["2025","\"Golden\"","KPop Demon Hunters"]
+];
+
+const OSCAR_ANIMATED = [
+["2001","Shrek"],["2002","Spirited Away"],["2003","Finding Nemo"],["2004","The Incredibles"],["2005","Wallace & Gromit: The Curse of the Were-Rabbit"],["2006","Happy Feet"],["2007","Ratatouille"],["2008","WALL-E"],["2009","Up"],["2010","Toy Story 3"],["2011","Rango"],["2012","Brave"],["2013","Frozen"],["2014","Big Hero 6"],["2015","Inside Out"],["2016","Zootopia"],["2017","Coco"],["2018","Spider-Man: Into the Spider-Verse"],["2019","Toy Story 4"],["2020","Soul"],["2021","Encanto"],["2022","Guillermo del Toro's Pinocchio"],["2023","The Boy and the Heron"],["2024","Flow"],["2025","KPop Demon Hunters"]
+];
+
+const MERCURY_PRIZE = [
+["1992","Primal Scream","Screamadelica"],["1993","Suede","Suede"],["1994","M People","Elegant Slumming"],["1995","Portishead","Dummy"],["1996","Pulp","Different Class"],["1997","Roni Size & Reprazent","New Forms"],["1998","Gomez","Bring It On"],["1999","Talvin Singh","OK"],["2000","Badly Drawn Boy","The Hour of Bewilderbeast"],["2001","PJ Harvey","Stories from the City, Stories from the Sea"],["2002","Ms. Dynamite","A Little Deeper"],["2003","Dizzee Rascal","Boy in da Corner"],["2004","Franz Ferdinand","Franz Ferdinand"],["2005","Antony and the Johnsons","I Am a Bird Now"],["2006","Arctic Monkeys","Whatever People Say I Am, That's What I'm Not"],["2007","Klaxons","Myths of the Near Future"],["2008","Elbow","The Seldom Seen Kid"],["2009","Speech Debelle","Speech Therapy"],["2010","The xx","xx"],["2011","PJ Harvey","Let England Shake"],["2012","alt-J","An Awesome Wave"],["2013","James Blake","Overgrown"],["2014","Young Fathers","Dead"],["2015","Benjamin Clementine","At Least for Now"],["2016","Skepta","Konnichiwa"],["2017","Sampha","Process"],["2018","Wolf Alice","Visions of a Life"],["2019","Dave","Psychodrama"],["2020","Michael Kiwanuka","Kiwanuka"],["2021","Arlo Parks","Collapsed in Sunbeams"],["2022","Little Simz","Sometimes I Might Be Introvert"],["2023","Ezra Collective","Where I'm Meant to Be"],["2024","English Teacher","This Could Be Texas"],["2025","Sam Fender","People Watching"]
+];
+
+/* ============================================================
+   OSCARS & MERCURY PRIZE — WIRING
+   ============================================================ */
+const oscDeckSel = document.getElementById('osc-deck');
+
+const oscFlash = makeFlashcards({
+  prefix: 'osc',
+  dataProvider: function(){
+    const which = oscDeckSel.value;
+    if(which==='picture'){
+      return OSCAR_PICTURE.map(([year,title])=>({front:'Best Picture, '+year, back:title}));
+    } else if(which==='actor'){
+      return OSCAR_ACTOR.map(([year,name,film])=>({front:'Best Actor, '+year, back:name+' &mdash; <i>'+film+'</i>'}));
+    } else if(which==='actress'){
+      return OSCAR_ACTRESS.map(([year,name,film])=>({front:'Best Actress, '+year, back:name+' &mdash; <i>'+film+'</i>'}));
+    } else if(which==='song'){
+      return OSCAR_SONG.map(([year,song,film])=>({front:'Best Original Song, '+year, back:song+' &mdash; <i>'+film+'</i>'}));
+    } else if(which==='animated'){
+      return OSCAR_ANIMATED.map(([year,title])=>({front:'Best Animated Feature, '+year, back:title}));
+    } else {
+      return MERCURY_PRIZE.map(([year,artist,album])=>({front:'Mercury Prize, '+year, back:artist+' &mdash; <i>'+album+'</i>'}));
+    }
+  },
+  flashEl: document.getElementById('osc-flash'),
+  revealBtn: document.getElementById('osc-reveal'),
+  gotBtn: document.getElementById('osc-got'),
+  missedBtn: document.getElementById('osc-missed'),
+  scoreEl: document.getElementById('osc-score-n'),
+  bestEl: document.getElementById('osc-best'),
+  shuffleBtn: document.getElementById('osc-shuffle'),
+});
+oscDeckSel.addEventListener('change', ()=> oscFlash.reload());
+
+/* ============================================================
+   TRAINING PLAN
+   ============================================================ */
+const PLAN_WEEK = [
+  {day:'Mon', core:'Cards/PAO (see phase)', deck:'Best Picture'},
+  {day:'Tue', core:'Cards/PAO (see phase)', deck:'Best Actor'},
+  {day:'Wed', core:'Cards/PAO (see phase)', deck:'Best Actress'},
+  {day:'Thu', core:'Cards/PAO (see phase)', deck:'Best Original Song'},
+  {day:'Fri', core:'Cards/PAO (see phase)', deck:'Best Animated Feature'},
+  {day:'Sat', core:'Cards/PAO (see phase)', deck:'Mercury Prize'},
+  {day:'Sun', core:'Cards/PAO (see phase)', deck:'Mixed review: whichever category scored lowest this week'},
+];
+const planWeekEl = document.getElementById('plan-week');
+const todayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
+planWeekEl.innerHTML = PLAN_WEEK.map((d,i)=>{
+  const isToday = i===todayIdx;
+  return '<div style="background:'+(isToday?'var(--accent)':'var(--panel2)')+'; border:1px solid var(--border); border-radius:10px; padding:12px 14px;">'
+    + '<div style="font-weight:700; font-size:13px; margin-bottom:6px;'+(isToday?'color:#fff;':'')+'">'+d.day+(isToday?' (today)':'')+'</div>'
+    + '<div style="font-size:13px;'+(isToday?'color:#fff;':'color:var(--text);')+'">5 min: '+d.core+'</div>'
+    + '<div style="font-size:13px;'+(isToday?'color:rgba(255,255,255,.85);':'color:var(--muted);')+'">5 min: '+d.deck+'</div>'
+    + '</div>';
+}).join('');
+</script>
+</body>
+</html>
