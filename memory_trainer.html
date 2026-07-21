@@ -81,6 +81,16 @@
   .card-chip.used{ opacity:.2; pointer-events:none; }
   .card-chip:hover{ transform:translateY(-2px); border-color:var(--accent); }
   .card-wrap{ display:flex; gap:8px; flex-wrap:wrap; }
+  .card-group{
+    display:flex; gap:6px; padding:8px;
+    border:1px dashed var(--border); border-radius:10px; background:rgba(255,255,255,.01);
+  }
+  .card-slot{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .pao-box{
+    background:var(--panel2); border:1px solid var(--border); border-radius:8px;
+    padding:5px 6px; font-size:10px; line-height:1.4; max-width:90px; text-align:center;
+  }
+  .pao-line b{ color:var(--accent2); }
   .recalled-list{ display:flex; gap:6px; flex-wrap:wrap; min-height:70px; padding:10px; background:var(--panel2); border-radius:10px; border:1px dashed var(--border); }
   .flash{
     background:var(--panel2); border:1px solid var(--border); border-radius:14px;
@@ -106,18 +116,14 @@
 
 <header>
   <h1>Memory Training Hub</h1>
-  <p>Random Numbers &middot; Speed Cards &middot; Historical Dates &middot; Nature Facts &middot; TKD Theory</p>
+  <p>Random Numbers &middot; Speed Cards &middot; My Systems &middot; Oscars &amp; Mercury</p>
 </header>
 
 <nav id="tabs">
-  <button data-tab="numbers" class="active">Numbers</button>
   <button data-tab="cards">Cards</button>
-  <button data-tab="dates">Dates</button>
-  <button data-tab="nature">Nature</button>
-  <button data-tab="tkd">TKD Theory</button>
+  <button data-tab="numbers" class="active">Numbers</button>
   <button data-tab="systems">My Systems</button>
   <button data-tab="oscars">Oscars &amp; Mercury</button>
-  <button data-tab="plan">Plan</button>
 </nav>
 
 <main>
@@ -156,7 +162,7 @@
 <section id="tab-cards" class="tabpanel hidden">
   <div class="panel">
     <h2>Speed Cards</h2>
-    <div class="sub">WMC discipline: memorise the order of one shuffled 52-card deck as fast as possible. Click cards in the order you remember them to recall.</div>
+    <div class="sub">WMC discipline: memorise the order of one shuffled 52-card deck as fast as possible. Cards are dealt three at a time &mdash; click any single card to reveal its own Person &middot; Action &middot; Object. When you're ready, stop and click cards in the order you remember them to recall.</div>
     <div class="row" style="margin-bottom:14px;">
       <button class="btn" id="cards-shuffle">Shuffle new deck</button>
       <button class="btn secondary" id="cards-start" disabled>Start memorizing</button>
@@ -175,77 +181,6 @@
       </div>
     </div>
     <div class="score-summary" id="cards-score"></div>
-  </div>
-</section>
-
-<!-- ================= DATES ================= -->
-<section id="tab-dates" class="tabpanel hidden">
-  <div class="panel">
-    <h2>Historical Dates</h2>
-    <div class="sub">Real world-history events. Flip the card, then mark yourself honestly &mdash; that's how the score stays useful.</div>
-    <div class="row" style="margin-bottom:14px;">
-      <label class="field">Direction
-        <select id="dates-dir">
-          <option value="both" selected>Mixed</option>
-          <option value="event">Event &rarr; Year</option>
-          <option value="year">Year &rarr; Event</option>
-        </select>
-      </label>
-      <button class="btn secondary" id="dates-shuffle">Shuffle deck</button>
-      <div class="stat"><div class="n" id="dates-score-n">0/0</div><div class="l">This session</div></div>
-      <div class="stat"><div class="n best" id="dates-best">&ndash;</div><div class="l">Best streak</div></div>
-    </div>
-    <div class="flash" id="dates-flash"><span></span></div>
-    <div class="row" style="justify-content:center;">
-      <button class="btn secondary" id="dates-reveal">Reveal</button>
-      <button class="btn good hidden" id="dates-got">Got it</button>
-      <button class="btn bad hidden" id="dates-missed">Missed it</button>
-    </div>
-  </div>
-</section>
-
-<!-- ================= NATURE ================= -->
-<section id="tab-nature" class="tabpanel hidden">
-  <div class="panel">
-    <h2>Nature Facts</h2>
-    <div class="sub">General biology &amp; ecology trivia, flashcard style.</div>
-    <div class="row" style="margin-bottom:14px;">
-      <button class="btn secondary" id="nature-shuffle">Shuffle deck</button>
-      <div class="stat"><div class="n" id="nature-score-n">0/0</div><div class="l">This session</div></div>
-      <div class="stat"><div class="n best" id="nature-best">&ndash;</div><div class="l">Best streak</div></div>
-    </div>
-    <div class="flash" id="nature-flash"><span></span></div>
-    <div class="row" style="justify-content:center;">
-      <button class="btn secondary" id="nature-reveal">Reveal</button>
-      <button class="btn good hidden" id="nature-got">Got it</button>
-      <button class="btn bad hidden" id="nature-missed">Missed it</button>
-    </div>
-  </div>
-</section>
-
-<!-- ================= TKD ================= -->
-<section id="tab-tkd" class="tabpanel hidden">
-  <div class="panel">
-    <h2>TKD Theory (ITF)</h2>
-    <div class="sub">Chang-Hon patterns and Korean terminology.</div>
-    <div class="row" style="margin-bottom:14px;">
-      <label class="field">Deck
-        <select id="tkd-deck">
-          <option value="patterns">Patterns (names, moves, meaning)</option>
-          <option value="terms">Terminology (Korean &harr; English)</option>
-        </select>
-      </label>
-      <div id="tkd-cat-wrap" class="chips hidden"></div>
-      <button class="btn secondary" id="tkd-shuffle">Shuffle deck</button>
-      <div class="stat"><div class="n" id="tkd-score-n">0/0</div><div class="l">This session</div></div>
-      <div class="stat"><div class="n best" id="tkd-best">&ndash;</div><div class="l">Best streak</div></div>
-    </div>
-    <div class="flash" id="tkd-flash"><span></span></div>
-    <div class="row" style="justify-content:center;">
-      <button class="btn secondary" id="tkd-reveal">Reveal</button>
-      <button class="btn good hidden" id="tkd-got">Got it</button>
-      <button class="btn bad hidden" id="tkd-missed">Missed it</button>
-    </div>
   </div>
 </section>
 
@@ -277,41 +212,27 @@
         <input type="text" id="sys-major-lookup" placeholder="e.g. 42" style="width:110px;">
       </label>
       <div class="stat" id="sys-major-lookup-result" style="min-width:220px;">&nbsp;</div>
+      <button class="btn secondary" id="sys-major-showall">Show full list</button>
     </div>
 
     <!-- PAO controls -->
     <div id="sys-pao-controls" class="row hidden" style="margin-bottom:14px;">
-      <label class="field">Look up a card
-        <input type="text" id="sys-pao-lookup" placeholder="e.g. QH" style="width:110px;">
-      </label>
-      <div class="stat" id="sys-pao-lookup-result" style="min-width:260px;">&nbsp;</div>
+      <button class="btn secondary" id="sys-pao-showall">Show full list</button>
     </div>
 
     <!-- Palace controls -->
     <div id="sys-palace-controls" class="row hidden" style="margin-bottom:14px;">
-      <label class="field">Quiz direction
-        <select id="sys-palace-dir">
-          <option value="both" selected>Mixed</option>
-          <option value="loc">Position &rarr; Location</option>
-          <option value="num">Location &rarr; Position</option>
-        </select>
-      </label>
       <button class="btn secondary" id="sys-palace-showall">Show full route</button>
-    </div>
-
-    <div class="row" style="margin-bottom:14px;">
-      <button class="btn secondary" id="sys-shuffle">Shuffle deck</button>
-      <div class="stat"><div class="n" id="sys-score-n">0/0</div><div class="l">This session</div></div>
-      <div class="stat"><div class="n best" id="sys-best">&ndash;</div><div class="l">Best streak</div></div>
     </div>
 
     <div id="sys-full-list" class="hidden" style="max-height:240px; overflow-y:auto; background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:14px; line-height:1.7;"></div>
 
-    <div class="flash" id="sys-flash"><span></span></div>
-    <div class="row" style="justify-content:center;">
-      <button class="btn secondary" id="sys-reveal">Reveal</button>
-      <button class="btn good hidden" id="sys-got">Got it</button>
-      <button class="btn bad hidden" id="sys-missed">Missed it</button>
+    <div id="sys-flashcards-wrap" class="hidden">
+      <div class="flash" id="sys-flash"><span></span></div>
+      <div class="row" style="justify-content:center;">
+        <button class="btn secondary" id="sys-reveal">Reveal</button>
+        <button class="btn hidden" id="sys-next">Next</button>
+      </div>
     </div>
   </div>
 </section>
@@ -333,43 +254,14 @@
         </select>
       </label>
       <button class="btn secondary" id="osc-shuffle">Shuffle deck</button>
-      <div class="stat"><div class="n" id="osc-score-n">0/0</div><div class="l">This session</div></div>
-      <div class="stat"><div class="n best" id="osc-best">&ndash;</div><div class="l">Best streak</div></div>
+      <button class="btn secondary" id="osc-showall">Show full list</button>
+      <div class="stat"><div class="n" id="osc-score-n">0</div><div class="l">Cards seen</div></div>
     </div>
+    <div id="osc-full-list" class="hidden" style="max-height:240px; overflow-y:auto; background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:14px; line-height:1.7;"></div>
     <div class="flash" id="osc-flash"><span></span></div>
     <div class="row" style="justify-content:center;">
       <button class="btn secondary" id="osc-reveal">Reveal</button>
-      <button class="btn good hidden" id="osc-got">Got it</button>
-      <button class="btn bad hidden" id="osc-missed">Missed it</button>
-    </div>
-  </div>
-</section>
-
-<!-- ================= TRAINING PLAN ================= -->
-<section id="tab-plan" class="tabpanel hidden">
-  <div class="panel">
-    <h2>Daily Plan: New Memory + Old Memory</h2>
-    <div class="sub">Two tracks, 5 minutes each, every day at 19:30. <b>New</b> = Cards &amp; PAO (novel material every session). <b>Old</b> = Oscars &amp; Mercury (stable facts, drilled by retrieval).</div>
-
-    <div style="background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:16px;">
-      <p style="margin:0 0 8px; font-weight:600;">The terminology, briefly</p>
-      <p style="margin:0 0 8px; color:var(--muted); font-size:14px; line-height:1.6;">Cognitive psychology splits long-term factual/experiential memory into two kinds: <b>episodic memory</b> (a specific, unrepeated event &mdash; this shuffled deck, this list of digits) and <b>semantic memory</b> (stable general knowledge with no particular "when" attached &mdash; who won Best Picture in 1994). Your "new" exercise trains fast <b>encoding</b> into episodic memory; your "old" exercise trains <b>retrieval practice</b> (repeated recall) against fixed semantic facts, the same mechanism spaced-repetition apps like Anki rely on.</p>
-    </div>
-
-    <div id="plan-week" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:20px;"></div>
-
-    <div style="background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:16px;">
-      <p style="margin:0 0 10px; font-weight:600;">How to run the 10 minutes (19:30 daily)</p>
-      <p style="margin:0 0 8px; color:var(--muted); font-size:14px; line-height:1.6;"><b>5 min &mdash; New (Cards &amp; PAO):</b> see the phase you're in below. Always untimed until noted otherwise; accuracy first.</p>
-      <p style="margin:0; color:var(--muted); font-size:14px; line-height:1.6;"><b>5 min &mdash; Old (Oscars &amp; Mercury):</b> open today's category shown above in the Oscars &amp; Mercury tab and run flashcards until the timer stops you. Missed cards reshuffle back into the deck automatically, so they'll resurface &mdash; that repetition is the point.</p>
-    </div>
-
-    <div style="background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 20px;">
-      <p style="margin:0 0 10px; font-weight:600;">New-memory phases (Cards &amp; PAO)</p>
-      <p style="margin:0 0 6px; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 1 (days 1&ndash;7):</b> My Systems &rarr; PAO Card System. Untimed lookup + flashcard quiz only. Goal: instant person+action+object recall for any card shown, no exceptions.</p>
-      <p style="margin:0 0 6px; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 2 (days 8&ndash;14):</b> Cards tab &mdash; shuffle a deck but only memorise the first 5 cards dealt, using your PAO images. Check recall. Once 3 days in a row are perfect, move to 10 cards.</p>
-      <p style="margin:0 0 6px; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 3 (weeks 3&ndash;4):</b> Grow to 15, then 20 cards, still untimed. Keep it bite-size &mdash; stop at your target count even if more of the deck is showing.</p>
-      <p style="margin:0; color:var(--muted); font-size:14px; line-height:1.6;"><b>Phase 4 (month 2+):</b> Once 20 cards feels easy untimed, switch on the clock and start working toward the full 52-card deck &mdash; this is the actual WMC Speed Cards discipline. Track your personal best.</p>
+      <button class="btn hidden" id="osc-next">Next</button>
     </div>
   </div>
 </section>
@@ -576,8 +468,43 @@ function saveBest(key, val){
     return '<div class="card-chip '+card.color+'" data-idx="'+idx+'">'+card.label+'</div>';
   }
 
+  function paoFor(card){
+    return PAO_CARDS.find(r=>r[0]===(card.rank+card.suit));
+  }
+
   function renderStudy(){
-    studyArea.innerHTML = deck.map((c,i)=>chipHTML(c,i)).join('');
+    // deal the deck 3 cards at a time (visual grouping only); click a single
+    // card to reveal just that card's own Person/Action/Object
+    const groups = [];
+    for(let i=0;i<deck.length;i+=3) groups.push(deck.slice(i,i+3));
+
+    studyArea.innerHTML = groups.map((g,gi)=>{
+      const slots = g.map((c,ci)=>{
+        const idx = gi*3+ci;
+        return '<div class="card-slot">'
+             +   chipHTML(c, idx)
+             +   '<div class="pao-box hidden" data-idx="'+idx+'"></div>'
+             + '</div>';
+      }).join('');
+      return '<div class="card-group">'+slots+'</div>';
+    }).join('');
+
+    studyArea.querySelectorAll('.card-chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        const idx = parseInt(chip.dataset.idx, 10);
+        const card = deck[idx];
+        const box = chip.parentElement.querySelector('.pao-box');
+        if(box.classList.contains('hidden')){
+          const hit = paoFor(card);
+          box.innerHTML = hit
+            ? '<div class="pao-line">'+hit[1]+' &middot; '+hit[2]+' &middot; '+hit[3]+'</div>'
+            : '<div class="pao-line">No PAO data</div>';
+          box.classList.remove('hidden');
+        } else {
+          box.classList.add('hidden');
+        }
+      });
+    });
   }
 
   function loadBestTime(){
@@ -674,16 +601,16 @@ function saveBest(key, val){
 })();
 
 /* ============================================================
-   GENERIC FLASHCARD ENGINE (used by Dates, Nature, TKD)
+   GENERIC FLASHCARD ENGINE (used by My Systems and Oscars & Mercury)
    ============================================================ */
 function makeFlashcards(opts){
-  // opts: prefix, dataProvider() -> [{front, back}], flashEl, revealBtn, gotBtn, missedBtn, scoreEl, bestEl, shuffleBtn
+  // opts: prefix, dataProvider() -> [{front, back}], flashEl, revealBtn, nextBtn, scoreEl, shuffleBtn
+  // opts.shuffle (optional): custom shuffle fn(arr)->arr, e.g. to keep a deck in fixed order
   let deck = [];
   let idx = 0;
-  let revealed = false;
-  let sessionCorrect = 0, sessionTotal = 0, streak = 0;
+  let seen = 0;
 
-  function shuffle(arr){
+  function defaultShuffle(arr){
     const a = arr.slice();
     for(let i=a.length-1;i>0;i--){
       const j = Math.floor(Math.random()*(i+1));
@@ -691,44 +618,31 @@ function makeFlashcards(opts){
     }
     return a;
   }
-
-  function loadBestStreak(){
-    const b = loadBest(opts.prefix+'_best_streak');
-    opts.bestEl.textContent = b ? b : '–';
+  function shuffle(arr){
+    return (typeof opts.shuffle === 'function') ? opts.shuffle(arr) : defaultShuffle(arr);
   }
 
   function updateScoreDisplay(){
-    opts.scoreEl.textContent = sessionCorrect+'/'+sessionTotal;
+    if(opts.scoreEl) opts.scoreEl.textContent = seen;
   }
 
   function showCard(){
-    revealed = false;
     if(idx >= deck.length){ idx = 0; }
     const card = deck[idx];
     opts.flashEl.innerHTML = '<span>'+card.front+'</span>';
     opts.revealBtn.classList.remove('hidden');
-    opts.gotBtn.classList.add('hidden');
-    opts.missedBtn.classList.add('hidden');
+    opts.nextBtn.classList.add('hidden');
   }
 
   function reveal(){
     const card = deck[idx];
     opts.flashEl.innerHTML = '<span class="tag">Answer</span><span>'+card.back+'</span>';
     opts.revealBtn.classList.add('hidden');
-    opts.gotBtn.classList.remove('hidden');
-    opts.missedBtn.classList.remove('hidden');
-    revealed = true;
+    opts.nextBtn.classList.remove('hidden');
   }
 
-  function next(correct){
-    sessionTotal++;
-    if(correct){ sessionCorrect++; streak++; }
-    else { streak = 0; }
-    const best = parseInt(loadBest(opts.prefix+'_best_streak') || '0');
-    if(streak > best){
-      saveBest(opts.prefix+'_best_streak', streak);
-      loadBestStreak();
-    }
+  function next(){
+    seen++;
     updateScoreDisplay();
     idx++;
     if(idx >= deck.length){
@@ -739,317 +653,29 @@ function makeFlashcards(opts){
   }
 
   opts.revealBtn.addEventListener('click', reveal);
-  opts.gotBtn.addEventListener('click', ()=>next(true));
-  opts.missedBtn.addEventListener('click', ()=>next(false));
+  opts.nextBtn.addEventListener('click', next);
   if(opts.shuffleBtn){
     opts.shuffleBtn.addEventListener('click', ()=>{
       deck = shuffle(opts.dataProvider());
-      idx = 0;
-      sessionCorrect = 0; sessionTotal = 0; streak = 0;
+      idx = 0; seen = 0;
       updateScoreDisplay();
       showCard();
     });
   }
 
-  loadBestStreak();
   deck = shuffle(opts.dataProvider());
+  updateScoreDisplay();
   showCard();
 
   return {
     reload: function(){
       deck = shuffle(opts.dataProvider());
-      idx = 0; sessionCorrect = 0; sessionTotal = 0; streak = 0;
+      idx = 0; seen = 0;
       updateScoreDisplay();
       showCard();
     }
   };
 }
-
-/* ============================================================
-   MODULE 3: HISTORICAL DATES (real events)
-   ============================================================ */
-const HISTORICAL_DATES = [
-  ["776 BCE","First recorded Ancient Olympic Games held at Olympia"],
-  ["509 BCE","Founding of the Roman Republic"],
-  ["490 BCE","Battle of Marathon, Greeks defeat the Persians"],
-  ["336 BCE","Alexander the Great becomes King of Macedon"],
-  ["44 BCE","Assassination of Julius Caesar"],
-  ["27 BCE","Augustus becomes Rome's first emperor"],
-  ["79 CE","Eruption of Mount Vesuvius destroys Pompeii"],
-  ["313 CE","Edict of Milan grants religious tolerance in the Roman Empire"],
-  ["410 CE","Sack of Rome by the Visigoths"],
-  ["476 CE","Fall of the Western Roman Empire"],
-  ["622 CE","The Hijra: Muhammad migrates from Mecca to Medina"],
-  ["793 CE","Viking raid on the monastery of Lindisfarne"],
-  ["1066","Battle of Hastings; Norman conquest of England"],
-  ["1088","University of Bologna founded, oldest university in the world"],
-  ["1215","Magna Carta signed by King John of England"],
-  ["1271","Marco Polo sets out on his journey to Asia"],
-  ["1347","The Black Death arrives in Europe"],
-  ["1440","Gutenberg develops the printing press"],
-  ["1453","Fall of Constantinople to the Ottoman Empire"],
-  ["1492","Columbus reaches the Americas"],
-  ["1517","Martin Luther publishes his Ninety-Five Theses"],
-  ["1519","Magellan's expedition begins its circumnavigation of the globe"],
-  ["1543","Copernicus publishes his heliocentric theory"],
-  ["1588","England defeats the Spanish Armada"],
-  ["1607","Jamestown, the first permanent English colony in America, founded"],
-  ["1618","The Thirty Years' War begins"],
-  ["1665","The Great Plague of London"],
-  ["1666","The Great Fire of London"],
-  ["1687","Newton publishes the Principia Mathematica"],
-  ["1776","U.S. Declaration of Independence signed"],
-  ["1789","French Revolution begins with the storming of the Bastille"],
-  ["1804","Napoleon crowns himself Emperor of France"],
-  ["1815","Battle of Waterloo; Napoleon's final defeat"],
-  ["1848","Wave of revolutions across Europe"],
-  ["1859","Darwin publishes On the Origin of Species"],
-  ["1861","U.S. Civil War begins"],
-  ["1865","U.S. Civil War ends; Abraham Lincoln assassinated"],
-  ["1869","The Suez Canal opens"],
-  ["1876","Alexander Graham Bell patents the telephone"],
-  ["1903","The Wright brothers achieve the first powered flight"],
-  ["1912","The RMS Titanic sinks"],
-  ["1914","World War I begins"],
-  ["1917","The Russian Revolution"],
-  ["1918","World War I ends"],
-  ["1929","The Wall Street Crash triggers the Great Depression"],
-  ["1939","World War II begins"],
-  ["1945","World War II ends; atomic bombs dropped on Hiroshima and Nagasaki"],
-  ["1947","India gains independence from Britain"],
-  ["1949","The People's Republic of China is founded"],
-  ["1953","Watson and Crick describe the structure of DNA"],
-  ["1957","The Soviet Union launches Sputnik, the first satellite"],
-  ["1961","Yuri Gagarin becomes the first human in space"],
-  ["1963","Assassination of U.S. President John F. Kennedy"],
-  ["1969","Apollo 11: first crewed Moon landing"],
-  ["1989","Fall of the Berlin Wall"],
-  ["1991","Dissolution of the Soviet Union"],
-  ["2001","September 11 terrorist attacks in the United States"],
-];
-
-/* ============================================================
-   MODULE 4: NATURE FACTS
-   ============================================================ */
-const NATURE_FACTS = [
-  ["The largest animal ever known to have lived","The blue whale, larger than any known dinosaur"],
-  ["Number of hearts an octopus has","Three"],
-  ["What a group of crows is called","A murder"],
-  ["Why honey never spoils","Its low moisture and acidity prevent microbial growth if stored sealed"],
-  ["One of the fastest-growing plants on Earth","Certain bamboo species, up to ~91 cm (36 in) in a day"],
-  ["Which came first: sharks or trees?","Sharks; they predate trees by tens of millions of years"],
-  ["Where a shrimp's heart is located","In its head"],
-  ["Why sea otters hold hands while sleeping","To keep from drifting apart on the water"],
-  ["Botanically, is a strawberry a berry?","No &ndash; but bananas and avocados are true berries"],
-  ["How some turtles breathe underwater in winter","Through their cloaca (\"butt breathing\")"],
-  ["Which large mammal cannot jump","The elephant"],
-  ["How long a snail can sleep in one stretch","Up to three years"],
-  ["Shape of a wombat's droppings","Cube-shaped"],
-  ["Share of world's oxygen produced by the Amazon rainforest","Roughly one-fifth (~20%), often called 'the lungs of the Earth'"],
-  ["Color of a polar bear's skin under its fur","Black"],
-  ["Why flamingos are pink","Pigments from the algae and shrimp in their diet; they're born grey"],
-  ["What's unique about koala fingerprints","They're nearly identical to human fingerprints"],
-  ["Do cows form social bonds?","Yes &ndash; they form best-friend pairs and show stress when separated"],
-  ["How many color receptor types mantis shrimp can have","Up to 16 (humans have 3)"],
-  ["Do starfish have brains or blood?","No &ndash; they use a water vascular system instead"],
-  ["Roughly how old is the oldest known living tree","Over 4,800 years (a Great Basin bristlecone pine)"],
-  ["What's unusual about the Venus flytrap's trigger","It only closes after being touched twice within about 20 seconds"],
-  ["Do dolphins have names?","Yes &ndash; each develops a unique signature whistle used like a name"],
-  ["Which animal's males give birth?","Seahorses"],
-  ["What a group of flamingos is called","A flamboyance"],
-  ["Which jellyfish is considered biologically immortal","Turritopsis dohrnii"],
-  ["How much sleep giraffes need per day","As little as 5 to 30 minutes"],
-  ["Which desert is the largest in the world","Antarctica (a polar desert)"],
-  ["What tardigrades (water bears) can survive","Extreme heat, cold, radiation, and even the vacuum of space"],
-  ["How trees can share resources underground","Via mycorrhizal fungal networks connecting their roots"],
-  ["How fast a hummingbird's heart can beat in flight","Over 1,200 beats per minute"],
-  ["How long a saguaro cactus can live","Over 150 years"],
-  ["What axolotls can regenerate","Entire limbs, and parts of their heart and brain"],
-  ["What a group of owls is called","A parliament"],
-  ["Can kangaroos walk backwards?","No &ndash; their tail and leg structure prevent it"],
-  ["Where the world's largest known single organism is found","Oregon, USA &ndash; a honey fungus (Armillaria ostoyae) spanning miles"],
-  ["Do cheetahs roar?","No &ndash; they chirp, purr, and meow instead"],
-  ["Which animal can hold its breath longer than a dolphin","The sloth"],
-  ["What body part butterflies taste with","Their feet"],
-  ["What a group of pandas is called","An embarrassment"],
-  ["Do rats laugh?","Yes &ndash; they emit ultrasonic chirps when tickled"],
-  ["What a narwhal's \"horn\" actually is","An elongated tooth"],
-  ["What's remarkable about monarch butterfly migration","Multi-generational journeys of thousands of miles, though no single butterfly completes the round trip"],
-  ["What leafcutter ants do with the leaves they cut","Use them to farm a fungus, their actual food source"],
-  ["Can crows recognize human faces?","Yes &ndash; and they can remember them for years"],
-];
-
-/* ============================================================
-   MODULE 5: TKD THEORY (ITF)
-   ============================================================ */
-const TKD_PATTERNS = [
-  ["Chon-Ji","19","\"Heaven and Earth.\" The creation of the universe / beginning of human history. First pattern learned by beginners: low blocks and punches represent Earth, middle blocks and punches represent Heaven."],
-  ["Dan-Gun","21","Named after the legendary founder of Korea. Upward blocks and high punches symbolize his rise."],
-  ["Do-San","24","Pseudonym of patriot Ahn Chang-Ho. Knife-hand strikes and punches; the 24 movements reflect his life devoted to Korean education and independence."],
-  ["Won-Hyo","28","Named after the monk who introduced Buddhism to the Silla Dynasty. Emphasizes balance and control."],
-  ["Yul-Gok","38","Pseudonym of philosopher Yi-I, the \"Confucius of Korea.\" Palm strikes and low stances."],
-  ["Joong-Gun","32","Named after patriot An Jung-Geun, who assassinated Ito Hirobumi, first Japanese governor-general of Korea. Precise hand techniques and kicks."],
-  ["Toi-Gye","37","Pen name of neo-Confucian scholar Yi Hwang. Combination of hand strikes, blocks and stances."],
-  ["Hwa-Rang","29","Named after the Hwarang youth warrior group of the Silla Dynasty. High kicks and strikes."],
-  ["Choong-Moo","30","Pseudonym of Admiral Yi Sun-Sin, inventor of the first armored battleship (turtle ship). Fast, powerful techniques including a jump kick."],
-  ["Kwang-Gae","39","Named after King Kwang-Gae-Toh-Wang, 19th king of Koguryo, who reclaimed lost territories. Low stances and powerful strikes."],
-  ["Po-Eun","36","Named after scholar and poet Chong Mong-Ju. Emphasizes balance and precision."],
-  ["Gae-Baek","44","Named after General Gae-Baek of the Baekje Dynasty. Powerful hand techniques and stances."],
-  ["Eui-Am","45","Pen name of Son Byong-Hi, leader of the Korean independence movement. Fast, dynamic strikes and blocks."],
-  ["Choong-Jang","52","Named after General Kim Duk-Ryang. Combination of high kicks and hand techniques."],
-  ["Juche","45","Represents the philosophy that humans are masters of their own destiny; the diagram represents Mt. Paekdu."],
-  ["Sam-Il","33","Commemorates the March 1st, 1919 Korean independence movement (33 patriots who planned it)."],
-  ["Yoo-Sin","68","Named after General Kim Yoo-Sin of the Silla Dynasty, who helped unify Korea. Hand techniques, kicks and stances."],
-  ["Choi-Yong","46","Named after General Choi-Yong, loyal commander of the Koryo Dynasty. Strong, dynamic techniques."],
-  ["Yon-Gae","49","Named after General Yon-Gae Somoon of the Koguryo Dynasty. Powerful strikes and blocks."],
-  ["Ul-Ji","42","Named after General Ul-Ji Mun-Dok, who defended Korea against the Tang Dynasty. Balance and precision."],
-  ["Moon-Moo","61","Honors King Moon-Moo of Silla, who unified Korea. Dynamic, complex techniques."],
-  ["So-San","72","Pseudonym of the monk Choi Hyong-Ung, who raised monk soldiers to repel Japanese invaders."],
-  ["Se-Jong","24","Named after King Se-Jong, creator of the Korean alphabet (Hangul); 24 letters, 24 movements."],
-  ["Tong-Il","56","Represents the resolve for reunification of Korea. Final pattern in the ITF syllabus."],
-];
-
-const TKD_TERMS = {
-  general: [
-    ["Seogi","Stance"], ["Chagi","Kick"], ["Chigi","Strike"], ["Jireugi","Punch"], ["Makgi","Block"],
-    ["Charyot","Attention"], ["Kyongrye","Bow"], ["Sijak","Begin / start"], ["Kalyeo","Stop / break"],
-    ["Baro","Return to ready position"], ["Dobok","Uniform"], ["Ti","Belt"], ["Dojang","Training hall"],
-    ["Sabomnim","Instructor"], ["Poomse / Tul","Pattern"], ["Kihap","Spirit yell"], ["Kyorugi","Sparring"],
-    ["Hosinsul","Self-defense"], ["Joonbi","Ready"],
-  ],
-  stances: [
-    ["Joonbi Seogi","Ready stance"], ["Ap Seogi","Walking / front stance"], ["Ap Koobi Seogi","Forward (L-)stance"],
-    ["Dwit Koobi Seogi","Back stance"], ["Beom Seogi","Tiger stance"], ["Joochoom Seogi","Sitting stance"],
-  ],
-  kicks: [
-    ["Ap Chagi","Front snap kick"], ["Yeop Chagi","Side kick"], ["Dollyo Chagi","Turning (roundhouse) kick"],
-    ["Bandal Chagi","45-degree kick"], ["Bandae Dollyo Chagi","Reverse turning kick"], ["Naeryo Chagi","Axe kick"],
-    ["Twieo Chagi","Jumping kick"], ["Dwit Chagi","Back kick"], ["Hooryo Chagi","Hook kick"], ["Milyo Chagi","Pushing kick"],
-  ],
-  blocks: [
-    ["Eolgool Makki","High section block"], ["Momtong Makki","Middle section block"], ["Arae Makki","Low section block"],
-    ["Sonnal Makki","Knife-hand block"], ["Hechyo Makki","Wedging / spreading block"],
-    ["Momtong Bakkat Makki","Middle outer block"], ["Momtong An Makki","Middle inner block"],
-    ["Hansonnal Makki","Single knife-hand block"],
-  ],
-  strikes: [
-    ["Baro Jireugi","Obverse punch"], ["Bandae Jireugi","Reverse punch"], ["Naeryo Jireugi","Downward punch"],
-    ["Yeop Jireugi","Side punch"], ["Chi Jireugi","Uppercut punch"], ["Palkoop Chigi","Elbow strike"],
-    ["Deung Joomeok","Backfist"], ["Me Joomeok","Hammer fist"], ["Batangson Chigi","Palm heel strike"],
-    ["Pyonson Keut Chigi","Spear finger strike"],
-  ],
-  body: [
-    ["Son","Hand"], ["Joomeok","Fist"], ["Sonnal","Knife hand"], ["Palmok","Forearm / wrist"], ["Palkoop","Elbow"],
-    ["Dari","Leg"], ["Balnal","Foot blade"], ["Mooreup","Knee"], ["Momtong","Middle section (torso)"],
-    ["Eolgool","High section (face/head)"], ["Arae","Low section"],
-  ],
-  counting: [
-    ["Hana","One"], ["Dul","Two"], ["Set","Three"], ["Net","Four"], ["Dasot","Five"],
-    ["Yasot","Six"], ["Ilgop","Seven"], ["Yodol","Eight"], ["Ahop","Nine"], ["Yol","Ten"],
-  ],
-};
-
-/* ============================================================
-   WIRE UP DATES, NATURE, TKD
-   ============================================================ */
-function shuffleArr(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-  return a;
-}
-
-// DATES
-makeFlashcards({
-  prefix: 'dates',
-  dataProvider: function(){
-    const dir = document.getElementById('dates-dir').value;
-    return HISTORICAL_DATES.map(([year,event])=>{
-      let d = dir;
-      if(d==='both') d = Math.random()<0.5 ? 'event' : 'year';
-      if(d==='year') return {front: year, back: event};
-      return {front: event, back: year};
-    });
-  },
-  flashEl: document.getElementById('dates-flash'),
-  revealBtn: document.getElementById('dates-reveal'),
-  gotBtn: document.getElementById('dates-got'),
-  missedBtn: document.getElementById('dates-missed'),
-  scoreEl: document.getElementById('dates-score-n'),
-  bestEl: document.getElementById('dates-best'),
-  shuffleBtn: document.getElementById('dates-shuffle'),
-});
-document.getElementById('dates-dir').addEventListener('change', ()=>{
-  document.getElementById('dates-shuffle').click();
-});
-
-// NATURE
-makeFlashcards({
-  prefix: 'nature',
-  dataProvider: function(){
-    return NATURE_FACTS.map(([q,a])=>({front:q, back:a}));
-  },
-  flashEl: document.getElementById('nature-flash'),
-  revealBtn: document.getElementById('nature-reveal'),
-  gotBtn: document.getElementById('nature-got'),
-  missedBtn: document.getElementById('nature-missed'),
-  scoreEl: document.getElementById('nature-score-n'),
-  bestEl: document.getElementById('nature-best'),
-  shuffleBtn: document.getElementById('nature-shuffle'),
-});
-
-// TKD
-const tkdCatWrap = document.getElementById('tkd-cat-wrap');
-const tkdDeckSel = document.getElementById('tkd-deck');
-let tkdActiveCats = new Set(Object.keys(TKD_TERMS));
-
-function renderTkdCats(){
-  tkdCatWrap.innerHTML = '';
-  if(tkdDeckSel.value !== 'terms'){ tkdCatWrap.classList.add('hidden'); return; }
-  tkdCatWrap.classList.remove('hidden');
-  Object.keys(TKD_TERMS).forEach(cat=>{
-    const chip = document.createElement('div');
-    chip.className = 'chip-toggle' + (tkdActiveCats.has(cat) ? ' on' : '');
-    chip.textContent = cat;
-    chip.addEventListener('click', ()=>{
-      if(tkdActiveCats.has(cat)) tkdActiveCats.delete(cat); else tkdActiveCats.add(cat);
-      renderTkdCats();
-      tkdFlash.reload();
-    });
-    tkdCatWrap.appendChild(chip);
-  });
-}
-
-const tkdFlash = makeFlashcards({
-  prefix: 'tkd',
-  dataProvider: function(){
-    if(tkdDeckSel.value === 'patterns'){
-      return TKD_PATTERNS.map(([name,moves,meaning])=>({
-        front: name,
-        back: moves+' movements. '+meaning
-      }));
-    } else {
-      let pool = [];
-      tkdActiveCats.forEach(cat=>{ pool = pool.concat(TKD_TERMS[cat]); });
-      if(pool.length===0) pool = [["No categories selected","Toggle a category above"]];
-      return pool.map(([korean,eng])=>{
-        return Math.random()<0.5 ? {front:korean, back:eng} : {front:eng, back:korean};
-      });
-    }
-  },
-  flashEl: document.getElementById('tkd-flash'),
-  revealBtn: document.getElementById('tkd-reveal'),
-  gotBtn: document.getElementById('tkd-got'),
-  missedBtn: document.getElementById('tkd-missed'),
-  scoreEl: document.getElementById('tkd-score-n'),
-  bestEl: document.getElementById('tkd-best'),
-  shuffleBtn: document.getElementById('tkd-shuffle'),
-});
-
-tkdDeckSel.addEventListener('change', ()=>{
-  renderTkdCats();
-  tkdFlash.reload();
-});
-renderTkdCats();
 
 /* ============================================================
    MY SYSTEMS: MAJOR SYSTEM, PAO CARDS, MEMORY PALACE
@@ -1068,14 +694,14 @@ const MAJOR_TRIPLE = [
 ];
 
 const PAO_CARDS = [
-["2C","Nick Cave","CaNter","CaNe"],["3C","Mariah Carey","CaMP","CuM"],["4C","Ruben Carter","CaRve","CoRe"],["5C","Lara Croft","CrawL","CooL"],["6C","Siôn Corn","CruSH","CaSH"],["7C","Chris Cornell","CaCkle","CoCo pops"],["8C","Fidel Castro","CaVort","CaVe"],["9C","Prince Charles","CaPture","CaPe"],["10C","Oswald Cobblepot","CaSt","CooS"],["JC","Jesus Christ","CaJole","CaGe"],["QC","Queen Cleopatra","ConQuer","KumQuat"],["KC","Krusty the Clown","CocK","CaKe"],["AC","Al Capone","ACt","CluB"],
-["2D","Nostradamus","DaNce","DoNner kebab"],["3D","Michael Douglas","DuMP","DiMe"],["4D","Roger Daltrey","DaRt","DeeR"],["5D","Leonardo DiCaprio","DriLL","DeaL"],["6D","Sharon Davies","DaSH","DaSH"],["7D","Cameron Diaz","DoCk","DeCor"],["8D","Victor von Doom","DraFt","DiVe"],["9D","P Diddy","DiP","DoPe"],["10D","Orville the Duck","DaZe","De Doo Doo Doo"],["JD","James Dean","DeJect","DodGe"],["QD","Quasimodo","DunK","QuaD bike"],["KD","Ken Dodd","DucK","DicK"],["AD","Ant and Dec","AiD","Diamond"],
-["2H","Noddy Holder","HoNk","HeN"],["3H","Michael Hutchence","HaMMer","HuM"],["4H","Rolf Harris","HuRl","WHoRe"],["5H","Lewis Hamilton","HowL","HaiL"],["6H","Shane Horgan","HuSH","HaSH"],["7H","Chris Hoy","HaCk","HiCCup"],["8H","François Hollande","HoVer","HooF"],["9H","Prince Harry","HoPe","HoP"],["10H","Owen Hart","HiSS","HoHoHo"],["JH","Jabba the Hutt","HiJack","HiJab"],["QH","Queen of Hearts","HusK","Queen of Hearts"],["KH","King Henry VIII","HacK","HiKe"],["AH","Adolf Hitler","AcHe","Heart"],
-["2S","Neville Southall","SaNd","SuN"],["3S","Mr Strong","SlaM","SuMo"],["4S","Rod Stewart","SoaR","SoRes"],["5S","Lisa Simpson","SaiL","Silo bin"],["6S","Sharon Stone","SlaSH","SaSH"],["7S","Captain Sparrow","SaCk","SiCk"],["8S","Frank Sinatra","ShaVe","SaFe"],["9S","Pete Sampras","SlaP","SiP"],["10S","Oscar Schindler","SiZe","Soo"],["JS","Jimmy Savile","SurGe","SaGe"],["QS","Steve McQueen","SQueeze","SeQuin"],["KS","Kevin Spacey","StaKe","SaKi"],["AS","Agent Smith","ASk","Spade"]
+["2C","Nick Cave","CaNter","CaNe"],["3C","Mariah Carey","CaMP","CuM"],["4C","Ruben Carter","CaRve","CoRe"],["5C","Lara Croft","CrawL","CooL"],["6C","Siôn Corn","CruSH","CaSH"],["7C","Chris Cornell","CoCoon","CoCo pops"],["8C","Fidel Castro","ConVert","CaVe"],["9C","Prince Charles","CaPture","CaPe"],["10C","Oswald Cobblepot","CaSt","CooS"],["JC","Jesus Christ","ConJure","CaGe"],["QC","Queen Cleopatra","ConQuer","KumQuat"],["KC","Krusty the Clown","ChoKe","CaKe"],["AC","Al Capone","ChA-ChA-ChA","CluB"],
+["2D","Nostradamus","DaNce","DoNner kebab"],["3D","Michael Douglas","DuMP","DiMe"],["4D","Roger Daltrey","DaRt","DeeR"],["5D","Leonardo DiCaprio","DriLL","DeaL"],["6D","Sharon Davies","DaSH","DaSH"],["7D","Cameron Diaz","DoCk","DeCor"],["8D","Victor von Doom","DeFy","DiVe"],["9D","P Diddy","DiP","DoPe"],["10D","Orville the Duck","DaZe","De Doo Doo Doo"],["JD","James Dean","DeeJay","DodGe"],["QD","Quasimodo","DisQualify","QuaD bike"],["KD","Ken Dodd","DrinK","DicK"],["AD","Ant and Dec","DioramA","Diamond"],
+["2H","Noddy Holder","HoNk","HeN"],["3H","Michael Hutchence","HaMMer","HuM"],["4H","Rolf Harris","HuRl","WHoRe"],["5H","Lewis Hamilton","HowL","HaiL"],["6H","Shane Horgan","HuSH","HaSH"],["7H","Chris Hoy","HunCh","HiCCup"],["8H","François Hollande","HooVer","HooF"],["9H","Prince Harry","HoPe","HoP"],["10H","Owen Hart","HiSS","HoHoHo"],["JH","Jabba the Hutt","HiJack","HiJab"],["QH","Queen of Hearts","HaQ","Queen of Hearts"],["KH","King Henry VIII","HawK","HiKe"],["AH","Adolf Hitler","HulA","Heart"],
+["2S","Neville Southall","SaNd","SuN"],["3S","Mr Strong","SlaM","SuMo"],["4S","Rod Stewart","SoaR","SoRes"],["5S","Lisa Simpson","SaiL","Silo bin"],["6S","Sharon Stone","SlaSH","SaSH"],["7S","Captain Sparrow","SCam","SiCk"],["8S","Frank Sinatra","ShaVe","SaFe"],["9S","Pete Sampras","SlaP","SiP"],["10S","Oscar Schindler","SiZe","Soo"],["JS","Jimmy Savile","SurGe","SaGe"],["QS","Steve McQueen","SQueeze","SeQuin"],["KS","Kevin Spacey","StaKe","SaKi"],["AS","Agent Smith","ScubA","Spade"]
 ];
 
 const PALACE = [
-"Parcel box","Shoe cupboard","Hanging from light","Far love seat with Dyfri","Lying on main sofa","Poking the fire","Near love seat with Tipsi","In junk under the stairs","Playing with lights on dinner table","Playing darts","On the toilet","Sliding down bannister","Slam Enfys door","Ivy bed","Curling hair in our room","Lava lamp in Noah's room","Boiling with boiler","Shower","Frying","Playing piano","Playing computer","Playing double bass","Washing and drying","Gym yoga / weights","Bumming Josh","In the barrel","In the shed","Doing the bins","Mowing the lawn","Plugging in car","Zombie by church","Up with the rooks","Jumping in big puddle","Pissed outside The Fox with Henson","Stuck in cattle grill","Riding a sheep","Quarry in high vis","Drug house","Wooden sign","Bike on bridge","Stroking peacock","Riding horse","Parking meter","Food festival","Sauna","Drench bucket","Camera trap","Dog walking","Sand dune sledge","Running into sea","Kite surfing","Flying into the sun"
+"Parcel box","Shoe cupboard","Far love seat with Dyfri watching TV","Poking the fire","Playing with lights on dinner table","Sliding down bannister","Ivy bed under duvet","Lava lamp in Noah's room","Shower","Frying","Playing piano","Playing double bass","Washing and drying","Gym yoga / weights","Bumming Josh","In the barrel","In the shed","Mowing the lawn"
 ];
 
 /* ---- wiring for the My Systems tab ---- */
@@ -1085,6 +711,7 @@ const sysPaoControls = document.getElementById('sys-pao-controls');
 const sysPalaceControls = document.getElementById('sys-palace-controls');
 const sysMajorLen = document.getElementById('sys-major-len');
 const sysFullList = document.getElementById('sys-full-list');
+const sysFlashcardsWrap = document.getElementById('sys-flashcards-wrap');
 
 function majorTableFor(len){
   if(len==='single') return MAJOR_SINGLE;
@@ -1096,6 +723,8 @@ function updateSysControlsVisibility(){
   sysMajorControls.classList.toggle('hidden', sysWhich.value!=='major');
   sysPaoControls.classList.toggle('hidden', sysWhich.value!=='pao');
   sysPalaceControls.classList.toggle('hidden', sysWhich.value!=='palace');
+  // only Memory Palace gets practice flashcards; Major/PAO are lookup + full list only
+  sysFlashcardsWrap.classList.toggle('hidden', sysWhich.value!=='palace');
   sysFullList.classList.add('hidden');
 }
 
@@ -1114,19 +743,17 @@ document.getElementById('sys-major-lookup').addEventListener('input', function()
 });
 sysMajorLen.addEventListener('change', ()=>{
   document.getElementById('sys-major-lookup').dispatchEvent(new Event('input'));
+  sysFullList.classList.add('hidden');
   sysFlash.reload();
 });
 
-// PAO lookup
-document.getElementById('sys-pao-lookup').addEventListener('input', function(){
-  const q = this.value.trim().toUpperCase();
-  const resultEl = document.getElementById('sys-pao-lookup-result');
-  if(!q){ resultEl.innerHTML = '&nbsp;'; return; }
-  const hit = PAO_CARDS.find(r=>r[0]===q);
-  if(hit){
-    resultEl.innerHTML = '<b>'+hit[0]+'</b>: '+hit[1]+' &middot; '+hit[2]+' &middot; '+hit[3];
-  } else {
-    resultEl.innerHTML = 'No match (try e.g. QH, 10C, AS)';
+// Major system: show full list
+document.getElementById('sys-major-showall').addEventListener('click', ()=>{
+  sysFullList.classList.toggle('hidden');
+  if(!sysFullList.classList.contains('hidden')){
+    sysFullList.innerHTML = majorTableFor(sysMajorLen.value).map(([num,word,phon])=>
+      '<div><b>'+num+'</b>: '+word+' <span style="color:var(--muted);">('+phon+')</span></div>'
+    ).join('');
   }
 });
 
@@ -1138,11 +765,20 @@ document.getElementById('sys-palace-showall').addEventListener('click', ()=>{
   }
 });
 
+// PAO: show full list
+document.getElementById('sys-pao-showall').addEventListener('click', ()=>{
+  sysFullList.classList.toggle('hidden');
+  if(!sysFullList.classList.contains('hidden')){
+    sysFullList.innerHTML = PAO_CARDS.map(([card,person,action,object])=>
+      '<div><b>'+card+'</b>: '+person+' &middot; '+action+' &middot; '+object+'</div>'
+    ).join('');
+  }
+});
+
 sysWhich.addEventListener('change', ()=>{
   updateSysControlsVisibility();
   sysFlash.reload();
 });
-document.getElementById('sys-palace-dir').addEventListener('change', ()=> sysFlash.reload());
 updateSysControlsVisibility();
 
 const sysFlash = makeFlashcards({
@@ -1160,22 +796,17 @@ const sysFlash = makeFlashcards({
         back: person + ' &middot; ' + action + ' &middot; ' + object
       }));
     } else {
-      const dir = document.getElementById('sys-palace-dir').value;
-      return PALACE.map((loc,i)=>{
-        let d = dir;
-        if(d==='both') d = Math.random()<0.5 ? 'loc' : 'num';
-        if(d==='num') return {front: loc, back: String(i+1)};
-        return {front: String(i+1), back: loc};
-      });
+      // Memory Palace: always practised strictly in order, 1 to 18
+      return PALACE.map((loc,i)=>({front: String(i+1), back: loc}));
     }
   },
   flashEl: document.getElementById('sys-flash'),
   revealBtn: document.getElementById('sys-reveal'),
-  gotBtn: document.getElementById('sys-got'),
-  missedBtn: document.getElementById('sys-missed'),
-  scoreEl: document.getElementById('sys-score-n'),
-  bestEl: document.getElementById('sys-best'),
-  shuffleBtn: document.getElementById('sys-shuffle'),
+  nextBtn: document.getElementById('sys-next'),
+  shuffle: function(arr){
+    // the Palace trainer is always in-order, never shuffled
+    return arr.slice();
+  },
 });
 
 /* ============================================================
@@ -1230,36 +861,40 @@ const oscFlash = makeFlashcards({
   },
   flashEl: document.getElementById('osc-flash'),
   revealBtn: document.getElementById('osc-reveal'),
-  gotBtn: document.getElementById('osc-got'),
-  missedBtn: document.getElementById('osc-missed'),
+  nextBtn: document.getElementById('osc-next'),
   scoreEl: document.getElementById('osc-score-n'),
-  bestEl: document.getElementById('osc-best'),
   shuffleBtn: document.getElementById('osc-shuffle'),
 });
-oscDeckSel.addEventListener('change', ()=> oscFlash.reload());
 
-/* ============================================================
-   TRAINING PLAN
-   ============================================================ */
-const PLAN_WEEK = [
-  {day:'Mon', core:'Cards/PAO (see phase)', deck:'Best Picture'},
-  {day:'Tue', core:'Cards/PAO (see phase)', deck:'Best Actor'},
-  {day:'Wed', core:'Cards/PAO (see phase)', deck:'Best Actress'},
-  {day:'Thu', core:'Cards/PAO (see phase)', deck:'Best Original Song'},
-  {day:'Fri', core:'Cards/PAO (see phase)', deck:'Best Animated Feature'},
-  {day:'Sat', core:'Cards/PAO (see phase)', deck:'Mercury Prize'},
-  {day:'Sun', core:'Cards/PAO (see phase)', deck:'Mixed review: whichever category scored lowest this week'},
-];
-const planWeekEl = document.getElementById('plan-week');
-const todayIdx = (new Date().getDay() + 6) % 7; // Monday = 0
-planWeekEl.innerHTML = PLAN_WEEK.map((d,i)=>{
-  const isToday = i===todayIdx;
-  return '<div style="background:'+(isToday?'var(--accent)':'var(--panel2)')+'; border:1px solid var(--border); border-radius:10px; padding:12px 14px;">'
-    + '<div style="font-weight:700; font-size:13px; margin-bottom:6px;'+(isToday?'color:#fff;':'')+'">'+d.day+(isToday?' (today)':'')+'</div>'
-    + '<div style="font-size:13px;'+(isToday?'color:#fff;':'color:var(--text);')+'">5 min: '+d.core+'</div>'
-    + '<div style="font-size:13px;'+(isToday?'color:rgba(255,255,255,.85);':'color:var(--muted);')+'">5 min: '+d.deck+'</div>'
-    + '</div>';
-}).join('');
+// Oscars & Mercury: show full list
+const oscFullList = document.getElementById('osc-full-list');
+function oscFullListHTML(){
+  const which = oscDeckSel.value;
+  if(which==='picture'){
+    return OSCAR_PICTURE.map(([year,title])=>'<div><b>'+year+'</b>: '+title+'</div>').join('');
+  } else if(which==='actor'){
+    return OSCAR_ACTOR.map(([year,name,film])=>'<div><b>'+year+'</b>: '+name+' &mdash; <i>'+film+'</i></div>').join('');
+  } else if(which==='actress'){
+    return OSCAR_ACTRESS.map(([year,name,film])=>'<div><b>'+year+'</b>: '+name+' &mdash; <i>'+film+'</i></div>').join('');
+  } else if(which==='song'){
+    return OSCAR_SONG.map(([year,song,film])=>'<div><b>'+year+'</b>: '+song+' &mdash; <i>'+film+'</i></div>').join('');
+  } else if(which==='animated'){
+    return OSCAR_ANIMATED.map(([year,title])=>'<div><b>'+year+'</b>: '+title+'</div>').join('');
+  } else {
+    return MERCURY_PRIZE.map(([year,artist,album])=>'<div><b>'+year+'</b>: '+artist+' &mdash; <i>'+album+'</i></div>').join('');
+  }
+}
+document.getElementById('osc-showall').addEventListener('click', ()=>{
+  oscFullList.classList.toggle('hidden');
+  if(!oscFullList.classList.contains('hidden')){
+    oscFullList.innerHTML = oscFullListHTML();
+  }
+});
+
+oscDeckSel.addEventListener('change', ()=>{
+  oscFlash.reload();
+  oscFullList.classList.add('hidden');
+});
 </script>
 </body>
 </html>
