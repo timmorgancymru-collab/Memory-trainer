@@ -58,17 +58,18 @@
   }
   .stat .n{ font-size:20px; font-weight:700; }
   .stat .l{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
-  .digit-grid{ font-family:"SF Mono",Consolas,monospace; line-height:1.9; font-size:20px; letter-spacing:2px; }
-  .digit-row{ display:flex; gap:16px; margin-bottom:8px; flex-wrap:wrap; }
+  .digit-grid{ font-family:"SF Mono",Consolas,monospace; line-height:2.4; font-size:20px; letter-spacing:2px; }
+  .digit-row{ margin-bottom:6px; }
   .digit-box{
     width:30px; height:38px; text-align:center; border:1px solid var(--border);
     border-radius:6px; background:var(--panel2); color:var(--text); font-size:18px;
     font-family:"SF Mono",Consolas,monospace;
+    margin:0 6px 6px 0;
   }
   .digit-box.correct{ border-color:var(--good); background:rgba(55,201,161,.15); }
   .digit-box.wrong{ border-color:var(--bad); background:rgba(229,98,107,.15); }
   .digit-static{
-    display:inline-block; width:22px; text-align:center;
+    display:inline-block; width:22px; text-align:center; margin-right:4px;
   }
   .card-chip{
     display:inline-flex; align-items:center; justify-content:center;
