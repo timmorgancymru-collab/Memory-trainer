@@ -59,7 +59,10 @@
   .stat .n{ font-size:20px; font-weight:700; }
   .stat .l{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
   .digit-grid{ font-family:"SF Mono",Consolas,monospace; line-height:2.4; font-size:20px; letter-spacing:2px; }
-  .digit-row{ margin-bottom:6px; }
+  .digit-row{
+    margin-bottom:10px; white-space:nowrap; overflow-x:auto; overflow-y:hidden;
+    padding-bottom:4px;
+  }
   .digit-box{
     width:30px; height:38px; text-align:center; border:1px solid var(--border);
     border-radius:6px; background:var(--panel2); color:var(--text); font-size:18px;
