@@ -61,18 +61,18 @@
   .digit-grid{ font-family:"SF Mono",Consolas,monospace; line-height:2.4; font-size:20px; letter-spacing:2px; }
   .digit-row{
     margin-bottom:10px; white-space:nowrap; overflow-x:auto; overflow-y:hidden;
-    padding-bottom:4px;
+    padding-bottom:4px; font-size:calc(1em * var(--scale, 1));
   }
   .digit-box{
-    width:30px; height:38px; text-align:center; border:1px solid var(--border);
-    border-radius:6px; background:var(--panel2); color:var(--text); font-size:18px;
+    width:calc(30px * var(--scale, 1)); height:calc(38px * var(--scale, 1)); text-align:center; border:1px solid var(--border);
+    border-radius:6px; background:var(--panel2); color:var(--text); font-size:calc(18px * var(--scale, 1));
     font-family:"SF Mono",Consolas,monospace;
-    margin:0 6px 6px 0;
+    margin:0 calc(6px * var(--scale, 1)) calc(6px * var(--scale, 1)) 0;
   }
   .digit-box.correct{ border-color:var(--good); background:rgba(55,201,161,.15); }
   .digit-box.wrong{ border-color:var(--bad); background:rgba(229,98,107,.15); }
   .digit-static{
-    display:inline-block; width:22px; text-align:center; margin-right:4px;
+    display:inline-block; width:calc(22px * var(--scale, 1)); text-align:center; margin-right:calc(4px * var(--scale, 1));
   }
   .card-chip{
     display:inline-flex; align-items:center; justify-content:center;
@@ -341,6 +341,20 @@ function saveBest(key, val){
     renderStudy();
   }
 
+  // Shrinks each row (via a --scale custom property) just enough that all its
+  // digits fit on one line without needing to scroll. naturalPerItem is the
+  // unscaled width (px) of one digit/box, including its right margin.
+  function fitRowsToWidth(container, naturalPerItem){
+    const w = container.clientWidth;
+    if(!w) return;
+    container.querySelectorAll('.digit-row').forEach(row=>{
+      const n = row.children.length;
+      const needed = n * naturalPerItem;
+      const scale = needed > w ? Math.max(0.5, w / needed) : 1;
+      row.style.setProperty('--scale', scale);
+    });
+  }
+
   function renderStudy(){
     let html = '<div class="digit-grid">';
     matrix.forEach(row=>{
@@ -352,6 +366,7 @@ function saveBest(key, val){
     });
     html += '</div>';
     studyArea.innerHTML = html;
+    fitRowsToWidth(studyArea, 26); // digit-static: 22px width + 4px margin
   }
 
   function renderRecall(){
@@ -364,6 +379,7 @@ function saveBest(key, val){
       html += '</div>';
     });
     recallArea.innerHTML = html;
+    fitRowsToWidth(recallArea, 36); // digit-box: 30px width + 6px margin
     // auto-advance
     const boxes = recallArea.querySelectorAll('.digit-box');
     boxes.forEach((b,idx)=>{
