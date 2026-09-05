@@ -71,7 +71,6 @@
   .digit-static{
     display:inline-block; width:22px; text-align:center; margin-right:4px;
   }
-  .digit-group{ display:inline-block; margin-right:10px; }
   .card-chip{
     display:inline-flex; align-items:center; justify-content:center;
     width:52px; height:64px; border-radius:8px; border:1px solid var(--border);
@@ -343,13 +342,9 @@ function saveBest(key, val){
     let html = '<div class="digit-grid">';
     matrix.forEach(row=>{
       html += '<div class="digit-row">';
-      for(let i=0;i<row.length;i+=5){
-        html += '<span class="digit-group">';
-        row.slice(i,i+5).forEach(d=>{
-          html += '<span class="digit-static">'+d+'</span>';
-        });
-        html += '</span>';
-      }
+      row.forEach(d=>{
+        html += '<span class="digit-static">'+d+'</span>';
+      });
       html += '</div>';
     });
     html += '</div>';
@@ -360,13 +355,9 @@ function saveBest(key, val){
     let html = '';
     matrix.forEach((row,ri)=>{
       html += '<div class="digit-row">';
-      for(let ci=0;ci<row.length;ci+=5){
-        html += '<span class="digit-group">';
-        for(let cj=ci; cj<Math.min(ci+5,row.length); cj++){
-          html += '<input maxlength="1" class="digit-box" data-r="'+ri+'" data-c="'+cj+'">';
-        }
-        html += '</span>';
-      }
+      row.forEach((d,ci)=>{
+        html += '<input maxlength="1" class="digit-box" data-r="'+ri+'" data-c="'+ci+'">';
+      });
       html += '</div>';
     });
     recallArea.innerHTML = html;
